@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - Báo cáo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    
+        @*<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />*@
+
+        <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/bootstrap.min.css")">        
+        <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+        <link rel="shortcut icon" href="@Url.Content("~/Content/assets/images/favicon.png")" />
+    
+    @RenderSection("styles", required: false)
+
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <!-- Logo hình ảnh -->
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="@Url.Content("~/Content/assets/images/log.png")" alt="Logo" height="30" class="d-inline-block align-text-top me-2" />
+            </a>
+
+            <!-- Hamburger -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @if (Session["User"] != null)
+                    {
+                        var user = Session["User"] as CT_Dashboard.Models.NGUOI_DUNG;
+                        if (user.VAI_TRO == "Admin")
+                        {
+                            <li class="nav-item"><a class="nav-link active" href="@Url.Action("Dashboard", "Dashboard")"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "DonVi")"><i class="bi bi-building"></i> Đơn vị</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "DiaBan")"><i class="bi bi-building"></i> Địa bàn</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "User")"><i class="bi bi-people"></i> Người dùng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "ChiTieu")"><i class="bi bi-list-check"></i> Chỉ tiêu</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "BaoCao")"><i class="bi bi-file-earmark-text"></i> Báo cáo</a>
+                            </li>
+
+                        }
+                        else if (user.VAI_TRO == "User")
+                        {
+
+                            <li class="nav-item"><a class="nav-link active" href="@Url.Action("Dashboard", "Dashboard")"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "BaoCao")"><i class="bi bi-file-earmark-text"></i> Quản lý báo cáo</a>
+                            </li>
+                        }
+                        else if (user.VAI_TRO == "Leader")
+                        {
+                            <li class="nav-item"><a class="nav-link active" href="@Url.Action("Dashboard", "Dashboard")"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("BaoCaoDaDuyet", "BaoCao")"><i class="bi bi-file-earmark-text"></i> Báo cáo đã duyệt</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("DuyetBaoCao", "BaoCao")"><i class="bi bi-file-earmark-text"></i> Duyệt báo cáo</a>
+                            </li>
+                        }
+                    }
+
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-house"></i> Trang chủ</a></li>
+                    @if (Session["User"] != null)
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Logout", "Account")"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Login", "Account")"><i class="bi bi-box-arrow-right"></i> Đăng nhập</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="container-fluid pt-4 px-4">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white mt-4 py-4 w-100">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 d-flex justify-content-center justify-content-md-start align-items-center">
+                    <span>Phòng DLRR Copyright © 2025, THUẾ THÀNH PHỐ CẦN THƠ. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center justify-content-md-end align-items-center mt-2 mt-md-0">
+                    <span><i class="bi bi-heart-fill text-danger ms-1"></i></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+    @*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>*@
+    <script src="@Url.Content("~/Content/assets/js/jquery-3.6.0.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/chart.js@4.4.0.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/chartjs-plugin-datalabels@2.2.0.js")"></script>
+
+    @*<script src="@Url.Content("~/Content/assets/js/chart.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/chartjs-plugin-datalabels@2.2.0.js")"></script>*@
+    <script src="@Url.Content("~/Content/assets/js/mychart.js")"></script>
+
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

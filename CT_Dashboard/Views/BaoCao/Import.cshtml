@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Nhập dữ liệu Báo cáo chi tiết";
+}
+<div class="container">
+    <h2 class="text-center">NHẬP BÁO CÁO CHI TIẾT TỪ EXCEL</h2>
+    @*<p>
+        @Html.ActionLink("Tải file mẫu", "DownloadSample", null, new { @class = "btn btn-info" })
+    </p>*@
+
+    @Html.AntiForgeryToken()
+    @Html.Hidden("id", (int)ViewBag.ID_BAO_CAO)
+    @if (ViewBag.Success != null)
+    {
+        <div class="alert alert-success">@ViewBag.Success</div>
+    }
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+    <form action="@Url.Action("Import")" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Chọn file Excel</label>
+            <input type="file" name="file" class="form-control" accept=".xlsx" />
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Tải và cập nhật dữ liệu</button>
+
+            @* Sửa nút Quay lại - kiểm tra vai trò để quyết định trang đích *@
+            @{
+                var currentUser = Session["User"] as CT_Dashboard.Models.NGUOI_DUNG;
+                string backUrl = "";
+                string backText = "Quay lại";
+
+                if (currentUser?.VAI_TRO == "Leader")
+                {
+                    backUrl = Url.Action("DuyetBaoCao", "BaoCao");
+                    backText = "Quay lại trang duyệt";
+                }
+                else if (currentUser?.VAI_TRO == "User")
+                {
+                    backUrl = Url.Action("Index", "BaoCao");
+                    backText = "Quay lại danh sách báo cáo";
+                }
+                else
+                {
+                    // Fallback: quay về chi tiết báo cáo
+                    backUrl = Url.Action("IndexChiTiet", new { id = (int)ViewBag.ID_BAO_CAO });
+                    backText = "Quay lại chi tiết báo cáo";
+                }
+            }
+
+            <a href="@backUrl" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> @backText
+            </a>
+        </div>
+    </form>
+</div>
+<div>
+
+</div>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="text-danger">
+        @Html.ValidationSummary()
+    </div>
+}
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+}

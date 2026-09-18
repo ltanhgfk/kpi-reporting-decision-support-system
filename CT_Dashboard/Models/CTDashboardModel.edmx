@@ -1,0 +1,551 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="CT_DASHBOARDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BAO_CAO">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TEN_BC" Type="nvarchar" MaxLength="100" />
+          <Property Name="NAM" Type="int" />
+          <Property Name="THANG" Type="int" />
+          <Property Name="NGAY" Type="date" />
+          <Property Name="DON_VI" Type="varchar" MaxLength="30" />
+          <Property Name="IS_LATEST" Type="bit" />
+          <Property Name="TRANG_THAI" Type="varchar" MaxLength="20" />
+          <Property Name="DIEN_GIAI" Type="nvarchar(max)" />
+          <Property Name="NGAY_TAO" Type="datetime" />
+          <Property Name="NGUOI_TAO" Type="int" />
+          <Property Name="NGAY_DUYET" Type="datetime" />
+          <Property Name="NGUOI_DUYET" Type="int" />
+          <Property Name="TRANG_THAI_DUYET" Type="varchar" MaxLength="20" />
+          <Property Name="LY_DO_TU_CHOI" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="BAO_CAO_CHI_TIET">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BAO_CAO" Type="int" />
+          <Property Name="DIA_BAN" Type="varchar" MaxLength="25" Nullable="false" />
+          <Property Name="CHI_TIEU" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="THUC_HIEN_TRONG_KY" Type="float" />
+          <Property Name="THUC_HIEN" Type="float" />
+          <Property Name="KE_HOACH" Type="float" />
+          <Property Name="CUNG_KY" Type="float" />
+          <Property Name="DVT" Type="nvarchar" MaxLength="50" />
+          <Property Name="NGUOI_TAO" Type="int" />
+          <Property Name="NGUOI_SUA" Type="int" />
+          <Property Name="NGAY_TAO" Type="datetime" />
+          <Property Name="NGAY_SUA" Type="datetime" />
+          <Property Name="DIEN_GIAI" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="CHI_TIEU">
+          <Key>
+            <PropertyRef Name="MA_CHI_TIEU" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MA_CHI_TIEU" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="TEN_CHI_TIEU" Type="nvarchar" MaxLength="200" />
+          <Property Name="TEN_DAY_DU" Type="nvarchar" MaxLength="200" />
+          <Property Name="MA_MAU" Type="varchar" MaxLength="10" />
+          <Property Name="PARENTID" Type="varchar" MaxLength="15" />
+          <Property Name="DON_VI" Type="varchar" MaxLength="30" />
+          <Property Name="DVT" Type="nvarchar" MaxLength="30" />
+          <Property Name="VI_TRI" Type="tinyint" />
+          <Property Name="TRANG_THAI" Type="varchar" MaxLength="10" />
+          <Property Name="QUAN_TRONG" Type="bit" />
+        </EntityType>
+        <EntityType Name="DIA_BAN">
+          <Key>
+            <PropertyRef Name="MA_DIA_BAN" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MA_DIA_BAN" Type="varchar" MaxLength="25" Nullable="false" />
+          <Property Name="TEN_DIA_BAN" Type="nvarchar" MaxLength="200" />
+          <Property Name="VI_TRI" Type="tinyint" />
+          <Property Name="TRANG_THAI" Type="varchar" MaxLength="10" />
+          <Property Name="QUAN_TRONG" Type="bit" />
+        </EntityType>
+        <EntityType Name="DON_VI">
+          <Key>
+            <PropertyRef Name="MA_DON_VI" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MA_DON_VI" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="TEN_DON_VI" Type="nvarchar" MaxLength="100" />
+          <Property Name="VI_TRI" Type="int" />
+          <Property Name="TRANG_THAI" Type="varchar" MaxLength="50" />
+          <Property Name="QUAN_TRONG" Type="bit" />
+        </EntityType>
+        <EntityType Name="NGUOI_DUNG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="HO_TEN" Type="nvarchar" MaxLength="100" />
+          <Property Name="DIEN_THOAI" Type="varchar" MaxLength="15" />
+          <Property Name="EMAIL" Type="varchar" MaxLength="100" />
+          <Property Name="DON_VI" Type="varchar" MaxLength="30" />
+          <Property Name="TRANG_THAI" Type="varchar" MaxLength="10" />
+          <Property Name="VAI_TRO" Type="varchar" MaxLength="10" />
+          <Property Name="USERNAME" Type="varchar" MaxLength="100" />
+          <Property Name="PASSWORD" Type="varchar" MaxLength="100" />
+          <Property Name="NGUOI_TAO" Type="int" />
+          <Property Name="NGUOI_SUA" Type="int" />
+          <Property Name="NGAY_TAO" Type="datetime" />
+          <Property Name="NGAY_SUA" Type="datetime" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <Association Name="FK_BAO_CAO_CHI_TIET_BAO_CAO">
+          <End Role="BAO_CAO" Type="Self.BAO_CAO" Multiplicity="0..1" />
+          <End Role="BAO_CAO_CHI_TIET" Type="Self.BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BAO_CAO">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="BAO_CAO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_CHI_TIET_CHI_TIEU">
+          <End Role="CHI_TIEU" Type="Self.CHI_TIEU" Multiplicity="1" />
+          <End Role="BAO_CAO_CHI_TIET" Type="Self.BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CHI_TIEU">
+              <PropertyRef Name="MA_CHI_TIEU" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="CHI_TIEU" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_CHI_TIET_DON_VI">
+          <End Role="DIA_BAN" Type="Self.DIA_BAN" Multiplicity="1" />
+          <End Role="BAO_CAO_CHI_TIET" Type="Self.BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DIA_BAN">
+              <PropertyRef Name="MA_DIA_BAN" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="DIA_BAN" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_DON_VI">
+          <End Role="DON_VI" Type="Self.DON_VI" Multiplicity="0..1" />
+          <End Role="BAO_CAO" Type="Self.BAO_CAO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DON_VI">
+              <PropertyRef Name="MA_DON_VI" />
+            </Principal>
+            <Dependent Role="BAO_CAO">
+              <PropertyRef Name="DON_VI" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NGUOI_DUNG_DON_VI">
+          <End Role="DON_VI" Type="Self.DON_VI" Multiplicity="0..1" />
+          <End Role="NGUOI_DUNG" Type="Self.NGUOI_DUNG" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DON_VI">
+              <PropertyRef Name="MA_DON_VI" />
+            </Principal>
+            <Dependent Role="NGUOI_DUNG">
+              <PropertyRef Name="DON_VI" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CT_DASHBOARDModelStoreContainer">
+          <EntitySet Name="BAO_CAO" EntityType="Self.BAO_CAO" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BAO_CAO_CHI_TIET" EntityType="Self.BAO_CAO_CHI_TIET" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CHI_TIEU" EntityType="Self.CHI_TIEU" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DIA_BAN" EntityType="Self.DIA_BAN" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DON_VI" EntityType="Self.DON_VI" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NGUOI_DUNG" EntityType="Self.NGUOI_DUNG" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_BAO_CAO" Association="Self.FK_BAO_CAO_CHI_TIET_BAO_CAO">
+            <End Role="BAO_CAO" EntitySet="BAO_CAO" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_CHI_TIEU" Association="Self.FK_BAO_CAO_CHI_TIET_CHI_TIEU">
+            <End Role="CHI_TIEU" EntitySet="CHI_TIEU" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_DON_VI" Association="Self.FK_BAO_CAO_CHI_TIET_DON_VI">
+            <End Role="DIA_BAN" EntitySet="DIA_BAN" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_DON_VI" Association="Self.FK_BAO_CAO_DON_VI">
+            <End Role="DON_VI" EntitySet="DON_VI" />
+            <End Role="BAO_CAO" EntitySet="BAO_CAO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NGUOI_DUNG_DON_VI" Association="Self.FK_NGUOI_DUNG_DON_VI">
+            <End Role="DON_VI" EntitySet="DON_VI" />
+            <End Role="NGUOI_DUNG" EntitySet="NGUOI_DUNG" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CT_DASHBOARDModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="CT_DASHBOARDEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BAO_CAO" EntityType="CT_DASHBOARDModel.BAO_CAO" />
+          <EntitySet Name="BAO_CAO_CHI_TIET" EntityType="CT_DASHBOARDModel.BAO_CAO_CHI_TIET" />
+          <EntitySet Name="CHI_TIEU" EntityType="CT_DASHBOARDModel.CHI_TIEU" />
+          <EntitySet Name="DIA_BAN" EntityType="CT_DASHBOARDModel.DIA_BAN" />
+          <EntitySet Name="DON_VI" EntityType="CT_DASHBOARDModel.DON_VI" />
+          <EntitySet Name="NGUOI_DUNG" EntityType="CT_DASHBOARDModel.NGUOI_DUNG" />
+          <EntitySet Name="sysdiagrams" EntityType="CT_DASHBOARDModel.sysdiagram" />
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_BAO_CAO" Association="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_BAO_CAO">
+            <End Role="BAO_CAO" EntitySet="BAO_CAO" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_DON_VI" Association="CT_DASHBOARDModel.FK_BAO_CAO_DON_VI">
+            <End Role="DON_VI" EntitySet="DON_VI" />
+            <End Role="BAO_CAO" EntitySet="BAO_CAO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_CHI_TIEU" Association="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_CHI_TIEU">
+            <End Role="CHI_TIEU" EntitySet="CHI_TIEU" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BAO_CAO_CHI_TIET_DON_VI" Association="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_DON_VI">
+            <End Role="DIA_BAN" EntitySet="DIA_BAN" />
+            <End Role="BAO_CAO_CHI_TIET" EntitySet="BAO_CAO_CHI_TIET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NGUOI_DUNG_DON_VI" Association="CT_DASHBOARDModel.FK_NGUOI_DUNG_DON_VI">
+            <End Role="DON_VI" EntitySet="DON_VI" />
+            <End Role="NGUOI_DUNG" EntitySet="NGUOI_DUNG" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="BAO_CAO">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TEN_BC" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NAM" Type="Int32" />
+          <Property Name="THANG" Type="Int32" />
+          <Property Name="NGAY" Type="DateTime" Precision="0" />
+          <Property Name="DON_VI" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="IS_LATEST" Type="Boolean" />
+          <Property Name="TRANG_THAI" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DIEN_GIAI" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NGAY_TAO" Type="DateTime" Precision="3" />
+          <Property Name="NGUOI_TAO" Type="Int32" />
+          <Property Name="NGAY_DUYET" Type="DateTime" Precision="3" />
+          <Property Name="NGUOI_DUYET" Type="Int32" />
+          <Property Name="TRANG_THAI_DUYET" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="LY_DO_TU_CHOI" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BAO_CAO_CHI_TIET" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_BAO_CAO" FromRole="BAO_CAO" ToRole="BAO_CAO_CHI_TIET" />
+          <NavigationProperty Name="DON_VI1" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_DON_VI" FromRole="BAO_CAO" ToRole="DON_VI" />
+        </EntityType>
+        <EntityType Name="BAO_CAO_CHI_TIET">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BAO_CAO" Type="Int32" />
+          <Property Name="DIA_BAN" Type="String" Nullable="false" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="CHI_TIEU" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="THUC_HIEN_TRONG_KY" Type="Double" />
+          <Property Name="THUC_HIEN" Type="Double" />
+          <Property Name="KE_HOACH" Type="Double" />
+          <Property Name="CUNG_KY" Type="Double" />
+          <Property Name="DVT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NGUOI_TAO" Type="Int32" />
+          <Property Name="NGUOI_SUA" Type="Int32" />
+          <Property Name="NGAY_TAO" Type="DateTime" Precision="3" />
+          <Property Name="NGAY_SUA" Type="DateTime" Precision="3" />
+          <Property Name="DIEN_GIAI" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BAO_CAO1" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_BAO_CAO" FromRole="BAO_CAO_CHI_TIET" ToRole="BAO_CAO" />
+          <NavigationProperty Name="CHI_TIEU1" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_CHI_TIEU" FromRole="BAO_CAO_CHI_TIET" ToRole="CHI_TIEU" />
+          <NavigationProperty Name="DIA_BAN1" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_DON_VI" FromRole="BAO_CAO_CHI_TIET" ToRole="DIA_BAN" />
+        </EntityType>
+        <EntityType Name="CHI_TIEU">
+          <Key>
+            <PropertyRef Name="MA_CHI_TIEU" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MA_CHI_TIEU" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="TEN_CHI_TIEU" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="TEN_DAY_DU" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="MA_MAU" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="PARENTID" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="DON_VI" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="DVT" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="VI_TRI" Type="Byte" />
+          <Property Name="TRANG_THAI" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="QUAN_TRONG" Type="Boolean" />
+          <NavigationProperty Name="BAO_CAO_CHI_TIET" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_CHI_TIEU" FromRole="CHI_TIEU" ToRole="BAO_CAO_CHI_TIET" />
+        </EntityType>
+        <EntityType Name="DIA_BAN">
+          <Key>
+            <PropertyRef Name="MA_DIA_BAN" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MA_DIA_BAN" Type="String" Nullable="false" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="TEN_DIA_BAN" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="VI_TRI" Type="Byte" />
+          <Property Name="TRANG_THAI" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="QUAN_TRONG" Type="Boolean" />
+          <NavigationProperty Name="BAO_CAO_CHI_TIET" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_CHI_TIET_DON_VI" FromRole="DIA_BAN" ToRole="BAO_CAO_CHI_TIET" />
+        </EntityType>
+        <EntityType Name="DON_VI">
+          <Key>
+            <PropertyRef Name="MA_DON_VI" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MA_DON_VI" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TEN_DON_VI" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="VI_TRI" Type="Int32" />
+          <Property Name="TRANG_THAI" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="QUAN_TRONG" Type="Boolean" />
+          <NavigationProperty Name="BAO_CAO" Relationship="CT_DASHBOARDModel.FK_BAO_CAO_DON_VI" FromRole="DON_VI" ToRole="BAO_CAO" />
+          <NavigationProperty Name="NGUOI_DUNG" Relationship="CT_DASHBOARDModel.FK_NGUOI_DUNG_DON_VI" FromRole="DON_VI" ToRole="NGUOI_DUNG" />
+        </EntityType>
+        <EntityType Name="NGUOI_DUNG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="HO_TEN" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="DIEN_THOAI" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="EMAIL" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DON_VI" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TRANG_THAI" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="VAI_TRO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="USERNAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="PASSWORD" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="NGUOI_TAO" Type="Int32" />
+          <Property Name="NGUOI_SUA" Type="Int32" />
+          <Property Name="NGAY_TAO" Type="DateTime" Precision="3" />
+          <Property Name="NGAY_SUA" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="DON_VI1" Relationship="CT_DASHBOARDModel.FK_NGUOI_DUNG_DON_VI" FromRole="NGUOI_DUNG" ToRole="DON_VI" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <Association Name="FK_BAO_CAO_CHI_TIET_BAO_CAO">
+          <End Type="CT_DASHBOARDModel.BAO_CAO" Role="BAO_CAO" Multiplicity="0..1" />
+          <End Type="CT_DASHBOARDModel.BAO_CAO_CHI_TIET" Role="BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BAO_CAO">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="BAO_CAO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_DON_VI">
+          <End Type="CT_DASHBOARDModel.DON_VI" Role="DON_VI" Multiplicity="0..1" />
+          <End Type="CT_DASHBOARDModel.BAO_CAO" Role="BAO_CAO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DON_VI">
+              <PropertyRef Name="MA_DON_VI" />
+            </Principal>
+            <Dependent Role="BAO_CAO">
+              <PropertyRef Name="DON_VI" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_CHI_TIET_CHI_TIEU">
+          <End Type="CT_DASHBOARDModel.CHI_TIEU" Role="CHI_TIEU" Multiplicity="1" />
+          <End Type="CT_DASHBOARDModel.BAO_CAO_CHI_TIET" Role="BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CHI_TIEU">
+              <PropertyRef Name="MA_CHI_TIEU" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="CHI_TIEU" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BAO_CAO_CHI_TIET_DON_VI">
+          <End Type="CT_DASHBOARDModel.DIA_BAN" Role="DIA_BAN" Multiplicity="1" />
+          <End Type="CT_DASHBOARDModel.BAO_CAO_CHI_TIET" Role="BAO_CAO_CHI_TIET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DIA_BAN">
+              <PropertyRef Name="MA_DIA_BAN" />
+            </Principal>
+            <Dependent Role="BAO_CAO_CHI_TIET">
+              <PropertyRef Name="DIA_BAN" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NGUOI_DUNG_DON_VI">
+          <End Type="CT_DASHBOARDModel.DON_VI" Role="DON_VI" Multiplicity="0..1" />
+          <End Type="CT_DASHBOARDModel.NGUOI_DUNG" Role="NGUOI_DUNG" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DON_VI">
+              <PropertyRef Name="MA_DON_VI" />
+            </Principal>
+            <Dependent Role="NGUOI_DUNG">
+              <PropertyRef Name="DON_VI" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CT_DASHBOARDModelStoreContainer" CdmEntityContainer="CT_DASHBOARDEntities">
+          <EntitySetMapping Name="BAO_CAO">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.BAO_CAO">
+              <MappingFragment StoreEntitySet="BAO_CAO">
+                <ScalarProperty Name="LY_DO_TU_CHOI" ColumnName="LY_DO_TU_CHOI" />
+                <ScalarProperty Name="TRANG_THAI_DUYET" ColumnName="TRANG_THAI_DUYET" />
+                <ScalarProperty Name="NGUOI_DUYET" ColumnName="NGUOI_DUYET" />
+                <ScalarProperty Name="NGAY_DUYET" ColumnName="NGAY_DUYET" />
+                <ScalarProperty Name="NGUOI_TAO" ColumnName="NGUOI_TAO" />
+                <ScalarProperty Name="NGAY_TAO" ColumnName="NGAY_TAO" />
+                <ScalarProperty Name="DIEN_GIAI" ColumnName="DIEN_GIAI" />
+                <ScalarProperty Name="TRANG_THAI" ColumnName="TRANG_THAI" />
+                <ScalarProperty Name="IS_LATEST" ColumnName="IS_LATEST" />
+                <ScalarProperty Name="DON_VI" ColumnName="DON_VI" />
+                <ScalarProperty Name="NGAY" ColumnName="NGAY" />
+                <ScalarProperty Name="THANG" ColumnName="THANG" />
+                <ScalarProperty Name="NAM" ColumnName="NAM" />
+                <ScalarProperty Name="TEN_BC" ColumnName="TEN_BC" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BAO_CAO_CHI_TIET">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.BAO_CAO_CHI_TIET">
+              <MappingFragment StoreEntitySet="BAO_CAO_CHI_TIET">
+                <ScalarProperty Name="DIEN_GIAI" ColumnName="DIEN_GIAI" />
+                <ScalarProperty Name="NGAY_SUA" ColumnName="NGAY_SUA" />
+                <ScalarProperty Name="NGAY_TAO" ColumnName="NGAY_TAO" />
+                <ScalarProperty Name="NGUOI_SUA" ColumnName="NGUOI_SUA" />
+                <ScalarProperty Name="NGUOI_TAO" ColumnName="NGUOI_TAO" />
+                <ScalarProperty Name="DVT" ColumnName="DVT" />
+                <ScalarProperty Name="CUNG_KY" ColumnName="CUNG_KY" />
+                <ScalarProperty Name="KE_HOACH" ColumnName="KE_HOACH" />
+                <ScalarProperty Name="THUC_HIEN" ColumnName="THUC_HIEN" />
+                <ScalarProperty Name="THUC_HIEN_TRONG_KY" ColumnName="THUC_HIEN_TRONG_KY" />
+                <ScalarProperty Name="CHI_TIEU" ColumnName="CHI_TIEU" />
+                <ScalarProperty Name="DIA_BAN" ColumnName="DIA_BAN" />
+                <ScalarProperty Name="BAO_CAO" ColumnName="BAO_CAO" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CHI_TIEU">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.CHI_TIEU">
+              <MappingFragment StoreEntitySet="CHI_TIEU">
+                <ScalarProperty Name="QUAN_TRONG" ColumnName="QUAN_TRONG" />
+                <ScalarProperty Name="TRANG_THAI" ColumnName="TRANG_THAI" />
+                <ScalarProperty Name="VI_TRI" ColumnName="VI_TRI" />
+                <ScalarProperty Name="DVT" ColumnName="DVT" />
+                <ScalarProperty Name="DON_VI" ColumnName="DON_VI" />
+                <ScalarProperty Name="PARENTID" ColumnName="PARENTID" />
+                <ScalarProperty Name="MA_MAU" ColumnName="MA_MAU" />
+                <ScalarProperty Name="TEN_DAY_DU" ColumnName="TEN_DAY_DU" />
+                <ScalarProperty Name="TEN_CHI_TIEU" ColumnName="TEN_CHI_TIEU" />
+                <ScalarProperty Name="MA_CHI_TIEU" ColumnName="MA_CHI_TIEU" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DIA_BAN">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.DIA_BAN">
+              <MappingFragment StoreEntitySet="DIA_BAN">
+                <ScalarProperty Name="QUAN_TRONG" ColumnName="QUAN_TRONG" />
+                <ScalarProperty Name="TRANG_THAI" ColumnName="TRANG_THAI" />
+                <ScalarProperty Name="VI_TRI" ColumnName="VI_TRI" />
+                <ScalarProperty Name="TEN_DIA_BAN" ColumnName="TEN_DIA_BAN" />
+                <ScalarProperty Name="MA_DIA_BAN" ColumnName="MA_DIA_BAN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DON_VI">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.DON_VI">
+              <MappingFragment StoreEntitySet="DON_VI">
+                <ScalarProperty Name="QUAN_TRONG" ColumnName="QUAN_TRONG" />
+                <ScalarProperty Name="TRANG_THAI" ColumnName="TRANG_THAI" />
+                <ScalarProperty Name="VI_TRI" ColumnName="VI_TRI" />
+                <ScalarProperty Name="TEN_DON_VI" ColumnName="TEN_DON_VI" />
+                <ScalarProperty Name="MA_DON_VI" ColumnName="MA_DON_VI" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NGUOI_DUNG">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.NGUOI_DUNG">
+              <MappingFragment StoreEntitySet="NGUOI_DUNG">
+                <ScalarProperty Name="NGAY_SUA" ColumnName="NGAY_SUA" />
+                <ScalarProperty Name="NGAY_TAO" ColumnName="NGAY_TAO" />
+                <ScalarProperty Name="NGUOI_SUA" ColumnName="NGUOI_SUA" />
+                <ScalarProperty Name="NGUOI_TAO" ColumnName="NGUOI_TAO" />
+                <ScalarProperty Name="PASSWORD" ColumnName="PASSWORD" />
+                <ScalarProperty Name="USERNAME" ColumnName="USERNAME" />
+                <ScalarProperty Name="VAI_TRO" ColumnName="VAI_TRO" />
+                <ScalarProperty Name="TRANG_THAI" ColumnName="TRANG_THAI" />
+                <ScalarProperty Name="DON_VI" ColumnName="DON_VI" />
+                <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
+                <ScalarProperty Name="DIEN_THOAI" ColumnName="DIEN_THOAI" />
+                <ScalarProperty Name="HO_TEN" ColumnName="HO_TEN" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="CT_DASHBOARDModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

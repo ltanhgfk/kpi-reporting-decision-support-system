@@ -1,0 +1,382 @@
+@model List<CT_Dashboard.Models.BaoCaoViewModel>
+@{
+    ViewBag.Title = "Chi tiết thu ngân sách theo từng địa bàn quản lý";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+    .stats-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .progress-enhanced {
+        height: 8px;
+        border-radius: 4px;
+    }
+
+    .badge-custom {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="detail-header text-center">
+        <div class="container">
+            <h1 class="mb-2">
+                <i class="mdi mdi-map-marker-multiple"></i>
+                @ViewBag.TieuDe
+            </h1>
+            <p class="mb-0">
+                <i class="mdi mdi-calendar"></i>
+                Cập nhật: @ViewBag.NgayCapNhat | Tháng @ViewBag.Thang/@ViewBag.Nam
+            </p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        @{
+            var tongThucHien = Model.Sum(x => x.ThucHien);
+            var tongKeHoach = Model.Sum(x => x.KeHoach);
+            var tongCungKy = Model.Sum(x => x.CungKy);
+            var tyLeTrungBinh = tongKeHoach > 0 ? Math.Round((tongThucHien / tongKeHoach) * 100, 1) : 0;
+        }
+
+        <div class="col-md-3">
+            <div class="card stats-card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="mdi mdi-trending-up" style="font-size: 2em;"></i>
+                    <h4 class="mt-2">@tongThucHien.ToString("N0")</h4>
+                    <p class="mb-0">Tổng thực hiện</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="mdi mdi-target" style="font-size: 2em;"></i>
+                    <h4 class="mt-2">@tongKeHoach.ToString("N0")</h4>
+                    <p class="mb-0">Tổng kế hoạch</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="mdi mdi-compare" style="font-size: 2em;"></i>
+                    <h4 class="mt-2">@tongCungKy.ToString("N0")</h4>
+                    <p class="mb-0">Cùng kỳ năm trước</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="mdi mdi-percent" style="font-size: 2em;"></i>
+                    <h4 class="mt-2">@tyLeTrungBinh%</h4>
+                    <p class="mb-0">Tỷ lệ hoàn thành</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-center mb-3">
+                    <i class="mdi mdi-chart-bar"></i>
+                    So sánh thực hiện vs kế hoạch
+                </h5>
+                <canvas id="comparisonChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-center mb-3">
+                    <i class="mdi mdi-chart-pie"></i>
+                    Tỷ trọng theo địa bàn
+                </h5>
+                <canvas id="pieChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="mdi mdi-table-large"></i>
+                        Chi tiết theo từng địa bàn
+                        <button class="btn btn-sm btn-success float-right" onclick="exportToExcel()">
+                            <i class="mdi mdi-file-excel"></i> Xuất Excel
+                        </button>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="detailTable" class="table table-hover">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Địa bàn</th>
+                                    <th class="text-right">Thực hiện</th>
+                                    <th class="text-right">Kế hoạch</th>
+                                    <th class="text-right">Cùng kỳ</th>
+                                    <th class="text-center">Tỷ lệ HT</th>
+                                    <th class="text-center">So với cùng kỳ</th>
+                                    <th class="text-center">Tiến độ</th>
+                                    <th class="text-center">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int stt = 1;}
+                                @foreach (var item in Model)
+                                {
+                                    var tyLe = item.KeHoach > 0 ? Math.Round((item.ThucHien / item.KeHoach) * 100, 1) : 0;
+                                    var soVoiCungKy = item.CungKy > 0 ? Math.Round(((item.ThucHien - item.CungKy) / item.CungKy) * 100, 1) : 0;
+                                    var trangThai = tyLe >= 100 ? "Đạt" : tyLe >= 80 ? "Gần đạt" : "Chưa đạt";
+                                    var badgeClass = tyLe >= 100 ? "success" : tyLe >= 80 ? "warning" : "danger";
+
+                                    <tr>
+                                        <td>@stt</td>
+                                        <td>
+                                            <strong>@item.TenDiaBan</strong>
+                                            <br>
+                                            <small class="text-muted">@item.MaDiaBan</small>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>@item.ThucHien.ToString("N0")</strong>
+                                            <br>
+                                            <small class="text-muted">@item.DonViTinh</small>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>@item.KeHoach.ToString("N0")</strong>
+                                            <br>
+                                            <small class="text-muted">@item.DonViTinh</small>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>@item.CungKy.ToString("N0")</strong>
+                                            <br>
+                                            <small class="text-muted">@item.DonViTinh</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-custom bg-@badgeClass text-white">
+                                                @tyLe%
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (soVoiCungKy > 0)
+                                            {
+                                                <span class="text-success">
+                                                    <i class="mdi mdi-arrow-up"></i> +@soVoiCungKy%
+                                                </span>
+                                            }
+                                            else if (soVoiCungKy < 0)
+                                            {
+                                                <span class="text-danger">
+                                                    <i class="mdi mdi-arrow-down"></i> @soVoiCungKy%
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">0%</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="progress progress-enhanced">
+                                                <div class="progress-bar bg-@badgeClass"
+                                                     role="progressbar"
+                                                     style="width: @(Math.Min(tyLe, 100))%"
+                                                     aria-valuenow="@tyLe"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">@tyLe%</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-custom bg-@badgeClass text-white">
+                                                @trangThai
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#detailTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json"
+                },
+                "order": [[ 5, "desc" ]], // Sort by completion rate
+                "pageLength": 25,
+                "responsive": true
+            });
+
+            // Chart data preparation
+            var labels = [@Html.Raw(string.Join(",", Model.Select(x => "'" + x.TenDiaBan + "'")))];
+            var thucHienData = [@Html.Raw(string.Join(",", Model.Select(x => x.ThucHien)))];
+            var keHoachData = [@Html.Raw(string.Join(",", Model.Select(x => x.KeHoach)))];
+            var cungKyData = [@Html.Raw(string.Join(",", Model.Select(x => x.CungKy)))];
+
+            // Comparison Bar Chart
+            var ctx1 = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Thực hiện',
+                        data: thucHienData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Kế hoạch',
+                        data: keHoachData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Cùng kỳ',
+                        data: cungKyData,
+                        backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('vi-VN').format(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    var percentage = Math.round((context.parsed / total) * 100);
+                                    return context.label + ': ' +
+                                           new Intl.NumberFormat('vi-VN').format(context.parsed) +
+                                           ' triệu đồng (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Export to Excel function
+        function exportToExcel() {
+            var wb = XLSX.utils.book_new();
+            var ws_data = [
+                ['STT', 'Địa bàn', 'Mã địa bàn', 'Thực hiện', 'Kế hoạch', 'Cùng kỳ', 'Tỷ lệ HT (%)', 'So với cùng kỳ (%)', 'Đơn vị tính']
+            ];
+
+            @{int exportStt = 1;}
+            @foreach (var item in Model)
+            {
+                var tyLe = item.KeHoach > 0 ? Math.Round((item.ThucHien / item.KeHoach) * 100, 1) : 0;
+                var soVoiCungKy = item.CungKy > 0 ? Math.Round(((item.ThucHien - item.CungKy) / item.CungKy) * 100, 1) : 0;
+                <text>
+                ws_data.push([
+                    @exportStt,
+                    '@Html.Raw(item.TenDiaBan?.Replace("'", "\\'"))',
+                    '@Html.Raw(item.MaDiaBan?.Replace("'", "\\'"))',
+                    @item.ThucHien,
+                    @item.KeHoach,
+                    @item.CungKy,
+                    @tyLe,
+                    @soVoiCungKy,
+                    '@Html.Raw(item.DonViTinh?.Replace("'", "\\'"))'
+                ]);
+                </text>
+                exportStt++;
+            }
+
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Chi tiết theo địa bàn");
+
+            var today = new Date();
+            var filename = "ChiTiet_DiaBan_" + today.getFullYear() +
+                          (today.getMonth() + 1).toString().padStart(2, '0') +
+                          today.getDate().toString().padStart(2, '0') + ".xlsx";
+
+            XLSX.writeFile(wb, filename);
+        }
+        // Print report function
+        function printReport() {
+            window.print();
+        }
+    </script>
+
+    <style media="print">
+        .btn, .no-print {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #ddd !important;
+        }
+
+        body {
+            font-size: 12px;
+        }
+    </style>
+}                    

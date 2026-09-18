@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "Kiểm tra file Excel";
+    var result = ViewBag.ValidationResult as CT_Dashboard.Models.ExcelValidationResult;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Kiểm tra file Excel</h3>
+                </div>
+                <div class="panel-body">
+                    <!-- Form Upload -->
+                    @using (Html.BeginForm("ValidateExcel", "Excel", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+                    {
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Chọn file Excel:</label>
+                            <div class="col-sm-9">
+                                <input type="file" name="excelFile" accept=".xlsx,.xls" class="form-control" required />
+                                <small class="text-muted">Chỉ chấp nhận file .xlsx hoặc .xls</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-check"></i> Kiểm tra file
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Kết quả validation -->
+                    @if (result != null)
+                    {
+                        <hr />
+                        <div class="validation-result">
+                            <h4>Kết quả kiểm tra</h4>
+
+                            <!-- Tổng quan -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert @(result.IsValid ? "alert-success" : "alert-danger")">
+                                        <strong>Trạng thái:</strong>
+                                        @(result.IsValid ? "✓ Hợp lệ" : "✗ Có lỗi")
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <strong>Số dòng:</strong> @result.ValidRows/@result.TotalRows
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lỗi -->
+                            @if (result.Errors.Any())
+                            {
+                                <div class="panel panel-danger">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">Lỗi (@result.Errors.Count)</h5>
+                                    </div>
+                                    <div class="panel-body">
+                                        <ul class="list-unstyled">
+                                            @foreach (var error in result.Errors)
+                                            {
+                                                <li class="text-danger">
+                                                    <i class="fa fa-times-circle"></i> @error
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Cảnh báo -->
+                            @if (result.Warnings.Any())
+                            {
+                                <div class="panel panel-warning">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">Cảnh báo (@result.Warnings.Count)</h5>
+                                    </div>
+                                    <div class="panel-body">
+                                        <ul class="list-unstyled">
+                                            @foreach (var warning in result.Warnings)
+                                            {
+                                                <li class="text-warning">
+                                                    <i class="fa fa-exclamation-triangle"></i> @warning
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Hướng dẫn -->
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Cấu trúc file mẫu</h4>
+                </div>
+                <div class="panel-body">
+                    <p>File Excel cần có các cột theo thứ tự sau:</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr class="active">
+                                    <th>STT</th>
+                                    <th>Tên cột</th>
+                                    <th>Kiểu dữ liệu</th>
+                                    <th>Bắt buộc</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>Giá bán</td><td>Text</td><td>✓</td></tr>
+                                <tr><td>2</td><td>HD</td><td>Text (Unique)</td><td>✓</td></tr>
+                                <tr><td>3</td><td>Thực hiện HT</td><td>Số</td><td></td></tr>
+                                <tr><td>4</td><td>Thực hiện (Lũy kế)</td><td>Số</td><td></td></tr>
+                                <tr><td>5</td><td>Kế hoạch</td><td>Số</td><td></td></tr>
+                                <tr><td>6</td><td>Cùng kỳ (Lũy kế)</td><td>Số</td><td></td></tr>
+                                <tr><td>7</td><td>Đơn vị tính</td><td>Số</td><td></td></tr>
+                                <tr><td>8</td><td>Năm</td><td>Số (4 chữ số)</td><td>✓</td></tr>
+                                <tr><td>9</td><td>Tháng</td><td>Số (1-12)</td><td>✓</td></tr>
+                                <tr><td>10</td><td>Ngày cập nhật</td><td>Ngày tháng</td><td>✓</td></tr>
+                                <tr><td>11</td><td>Diễn giải</td><td>Text</td><td>✓</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Lưu ý:</strong>
+                        <ul>
+                            <li>Cột HD không được trùng lặp</li>
+                            <li>Dòng đầu tiên phải chứa tiêu đề cột chính xác</li>
+                            <li>Các dòng trống sẽ được bỏ qua</li>
+                            <li>Định dạng ngày tháng: dd/MM/yyyy hoặc MM/dd/yyyy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .validation-result {
+        margin-top: 20px;
+    }
+
+    .panel-title {
+        font-weight: bold;
+    }
+
+    .list-unstyled li {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-left: 3px solid transparent;
+    }
+
+    .text-danger {
+        border-left-color: #d9534f !important;
+        background-color: #f9f2f2;
+    }
+
+    .text-warning {
+        border-left-color: #f0ad4e !important;
+        background-color: #fdf7e9;
+    }
+
+    .fa {
+        margin-right: 5px;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Validation form trước khi submit
+        $('form').on('submit', function(e) {
+            var fileInput = $('input[type="file"]')[0];
+            if (!fileInput.files.length) {
+                alert('Vui lòng chọn file Excel để kiểm tra');
+                e.preventDefault();
+                return false;
+            }
+
+            // Hiển thị loading
+            var submitBtn = $('button[type="submit"]');
+            submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Đang kiểm tra...');
+            submitBtn.prop('disabled', true);
+        });
+    });
+</script>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+}

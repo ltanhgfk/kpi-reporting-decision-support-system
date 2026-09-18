@@ -1,0 +1,93 @@
+@model CT_Dashboard.Models.BAO_CAO
+@{
+    ViewBag.Title = "Thêm Báo Cáo Mới";
+
+    // Thiết lập giá trị mặc định cho ngày tháng năm hiện tại
+    var today = DateTime.Now;
+    if (Model != null)
+    {
+        Model.NAM = Model.NAM ?? today.Year;
+        Model.THANG = Model.THANG ?? today.Month;
+        Model.NGAY = Model.NGAY ?? today;
+    }
+}
+<div class="container">
+    <h2 class="text-center">THÊM BÁO CÁO MỚI</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @*<div class="form-group">
+                @Html.Label("TEN_BC", "Tên báo cáo", new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.TEN_BC, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.TEN_BC, "", new { @class = "text-danger" })
+            </div>*@
+            <div class="form-group">
+                @Html.Label("NAM", "Năm", new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.NAM, new { htmlAttributes = new { @class = "form-control", @Value = DateTime.Now.Year } })
+                @Html.ValidationMessageFor(model => model.NAM, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.Label("THANG", "Tháng", new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.THANG, new { htmlAttributes = new { @class = "form-control", @Value = DateTime.Now.Month } })
+                @Html.ValidationMessageFor(model => model.THANG, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.Label("NGAY", "Ngày", new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.NGAY, new { htmlAttributes = new { @class = "form-control", type = "date", @Value = DateTime.Now.ToString("yyyy-MM-dd") } })
+                @Html.ValidationMessageFor(model => model.NGAY, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.Label("DIEN_GIAI", "Diễn giải", new { @class = "control-label col-md-2" })
+                @Html.TextAreaFor(model => model.DIEN_GIAI, new { @class = "form-control", rows = 3 })
+                @Html.ValidationMessageFor(model => model.DIEN_GIAI, "", new { @class = "text-danger" })
+            </div>
+
+            @*<div class="form-group">
+                        @Html.LabelFor(model => model.DON_VI, new { @class = "control-label col-md-2" })
+                        @Html.DropDownList("DON_VI", null, "Chọn đơn vị", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.DON_VI1, "", new { @class = "text-danger" })
+                </div>*@
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Thêm" class="btn btn-success" />
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Đảm bảo giá trị mặc định được thiết lập khi trang load
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = today.getMonth() + 1;
+            var day = today.getDate();
+            var formattedDate = today.getFullYear() + '-' +
+                String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                String(today.getDate()).padStart(2, '0');
+
+            // Thiết lập giá trị nếu các trường đang trống
+            if (!$('#NAM').val()) {
+                $('#NAM').val(year);
+            }
+            if (!$('#THANG').val()) {
+                $('#THANG').val(month);
+            }
+            if (!$('#NGAY').val()) {
+                $('#NGAY').val(formattedDate);
+            }
+        });
+    </script>
+}
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../Content/assets/css/style.css">
+}

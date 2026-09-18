@@ -1,0 +1,103 @@
+@model CT_Dashboard.Models.CHI_TIEU
+@{
+    ViewBag.Title = "Cập nhật Chỉ tiêu";
+}
+<div class="container">
+    <h2 class="text-center">CẬP NHẬT CHỈ TIÊU</h2>
+    @using (Html.BeginForm("Edit", "ChiTieu", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.MA_CHI_TIEU)
+        <div class="form-horizontal">
+
+            <!-- MA_CHI_TIEU -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.MA_CHI_TIEU, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.MA_CHI_TIEU, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+            </div>
+
+            <!-- TEN_CHI_TIEU -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.TEN_CHI_TIEU, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.TEN_CHI_TIEU, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.TEN_CHI_TIEU, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- MA_MAU -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.MA_MAU, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.MA_MAU, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MA_MAU, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- PARENTID -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.PARENTID, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.DropDownListFor(model => model.PARENTID, (SelectList)ViewBag.CHI_TIEU, "Không có", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PARENTID, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- DON_VI -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.DON_VI, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.DropDownListFor(model => model.DON_VI, (SelectList)ViewBag.DON_VI, "Không có", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DON_VI, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- DVT -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.DVT, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.DVT, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DVT, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- VI_TRI -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.VI_TRI, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.EditorFor(model => model.VI_TRI, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.VI_TRI, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- QUAN_TRONG -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.QUAN_TRONG, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.RadioButtonFor(model => model.QUAN_TRONG, true, new { @id = "quan_trong_true" })
+                    <label for="quan_trong_true" class="radio-inline">Đúng</label>
+                    @Html.RadioButtonFor(model => model.QUAN_TRONG, false, new { @id = "quan_trong_false" })
+                    <label for="quan_trong_false" class="radio-inline">Không đúng</label>
+                </div>
+                @Html.ValidationMessageFor(model => model.QUAN_TRONG, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- TRANG_THAI -->
+            <div class="form-group">
+                @Html.LabelFor(model => model.TRANG_THAI, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.DropDownListFor(model => model.TRANG_THAI,
+                    new SelectList(new List<SelectListItem> {
+                        new SelectListItem { Text = "Active", Value = "Active" },
+                        new SelectListItem { Text = "Disabled", Value = "Disabled" }
+                    }, "Value", "Text", Model.TRANG_THAI),
+                    "Chọn trạng thái", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TRANG_THAI, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Nút Lưu -->
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Lưu" class="btn btn-primary" />
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+}

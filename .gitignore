@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+[Bb]uild/
+
+# Packages restored by NuGet
+packages/
+
+# Local/runtime data
+CT_Dashboard/Files/Uploads/
+CT_Dashboard/App_Data/
+
+# Local configuration
+*.local
+*.secret
+.env
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

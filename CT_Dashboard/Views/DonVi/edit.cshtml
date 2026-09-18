@@ -1,0 +1,66 @@
+@model CT_Dashboard.Models.DON_VI
+@using CT_Dashboard.Models;
+
+@{
+    ViewBag.Title = "Cập nhật địa bàn";
+    CT_DASHBOARDEntities db = new CT_DASHBOARDEntities();
+}
+<div class="container">
+    <h2 class="text-center">CẬP NHẬT ĐƠN VỊ</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MA_DON_VI, "Mã đơn vị")
+            @Html.EditorFor(model => model.MA_DON_VI, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TEN_DON_VI, "Tên đơn vị")
+            @Html.EditorFor(model => model.TEN_DON_VI, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.TEN_DON_VI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.VI_TRI, "Vị trí")
+            @Html.EditorFor(model => model.VI_TRI, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+            @Html.ValidationMessageFor(model => model.VI_TRI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TRANG_THAI, "Trạng thái")
+            @Html.DropDownListFor(model => model.TRANG_THAI, 
+                new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "Hoạt động", Value = "Active" },
+                    new SelectListItem { Text = "Không hoạt động", Value = "Inactive" },
+                    new SelectListItem { Text = "Tạm ngưng", Value = "Temp" }
+                }, 
+                "-- Chọn trạng thái --", 
+                new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.TRANG_THAI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                @Html.CheckBox("QUAN_TRONG", Model.QUAN_TRONG ?? false, new { @class = "form-check-input" })
+                @Html.Label("QUAN_TRONG", "Địa bàn quan trọng", new { @class = "form-check-label" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+            </div>
+        </div>
+    }
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+}

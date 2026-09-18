@@ -1,0 +1,118 @@
+@model PagedList.IPagedList<CT_Dashboard.Models.BAO_CAO>
+@using CT_Dashboard.Models;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Quản lý Báo cáo";
+    int i = 0;
+}
+<div class="container-scroller">
+    <h2 class="text-center">QUẢN LÝ BÁO CÁO</h2>
+    <div class="row">
+        <div class="col-lg-8"><a href="@Url.Action("Create")" class="btn btn-primary mb-3">Thêm báo cáo mới</a></div>
+        <div class="col-lg-4">
+            @using (Html.BeginForm("Index", "BaoCao", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <div class="form-group">
+                    <label for="searchString" class="mr-2">Tìm kiếm:</label>
+                    <input type="text" name="searchString" class="form-control mr-2" value="@ViewBag.SearchString" placeholder="Tên báo cáo hoặc Đơn vị" />
+                    <button type="submit" class="btn btn-info">Lọc</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>STT</th>
+                <th>Tên báo cáo</th>
+                @*<th>Năm</th>
+                <th>Tháng</th>*@
+                <th>Số liệu ngày</th>
+                <th>Đơn vị</th>
+
+                <th>Diễn giải</th>
+                <th>Trạng thái nhập</th>
+                @*<th>Ngày tạo</th>
+                <th>Người tạo</th>
+                <th>Ngày duyệt</th>
+                <th>Người duyệt</th>*@
+                <th>Trạng thái duyệt</th>
+                <th>Lý do từ chối</th>
+                <th>Chi tiết</th>
+                @*<th>Đã nhập báo cáo</th>*@
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                i++;
+                string reported = item.BAO_CAO_CHI_TIET.Count >= 1 ? "HasDetail" : "NoDetail";
+                //bool isDaDuyet = item.TRANG_THAI_DUYET == "DaDuyet";
+                bool isDaDuyet = item.TRANG_THAI_DUYET == "DaDuyet" || item.TRANG_THAI_DUYET == "TrinhLanhDao" || item.TRANG_THAI_DUYET == "TuChoi";
+                <tr>
+                    <td>@i</td>
+                    <td>@item.TEN_BC</td>
+                    @*<td>@item.NAM</td>
+                    <td>@item.THANG</td>*@
+                    <td>@item.NGAY</td>
+                    <td>@item.DON_VI</td>
+
+                    <td>@item.DIEN_GIAI</td>
+                    @*<td>@(item.NGAY_TAO.HasValue ? item.NGAY_TAO.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                    <td>@item.NGUOI_TAO</td>
+                    <td>@(item.NGAY_DUYET.HasValue ? item.NGAY_DUYET.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                    <td>@item.NGUOI_DUYET</td>*@
+                    <td>@item.TRANG_THAI</td>
+                    <td>@item.TRANG_THAI_DUYET</td>
+                    <td>@item.LY_DO_TU_CHOI</td>
+                    <td>
+                        @if (reported == "HasDetail")
+                        {
+                            <a href="@Url.Action("IndexChiTiet", new { id = item.ID })" class="btn btn-sm btn-warning">Xem báo cáo chi tiết</a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Import", new { id = item.ID })" class="btn btn-sm btn-warning">Nhập báo cáo chi tiết</a>
+                        }
+                    </td>
+                    @*<td>
+                    </td>*@
+                    @*<td>@reported</td>*@
+                <td>
+                    @if (isDaDuyet)
+                    {
+                        <!-- Nút bị vô hiệu hóa khi đã duyệt -->
+                        <button class="btn btn-sm btn-secondary" disabled title="Không thể chuyển báo cáo đã duyệt">Chuyển lãnh đạo</button>
+                        <button class="btn btn-sm btn-secondary" disabled title="Không thể sửa báo cáo đã duyệt">Sửa</button>
+                        <button class="btn btn-sm btn-secondary" disabled title="Không thể xóa báo cáo đã duyệt">Xóa</button>
+                    }
+                    else
+                    {
+                        <!-- Nút hoạt động bình thường khi chưa duyệt -->
+                        <a href="@Url.Action("ChuyenLanhDao", new { id = item.ID })" class="btn btn-sm btn-primary">Chuyển lãnh đạo</a>
+                        <a href="@Url.Action("Edit", new { id = item.ID })" class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="@Url.Action("Delete", new { id = item.ID })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                    }
+                </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewBag.SearchString }))
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../Content/assets/css/style.css">
+    <style>
+        /* Style cho nút bị vô hiệu hóa */
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+}

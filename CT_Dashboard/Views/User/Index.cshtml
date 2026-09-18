@@ -1,0 +1,101 @@
+﻿@model PagedList.IPagedList<CT_Dashboard.Models.NGUOI_DUNG>
+@using CT_Dashboard.Models;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Quản lý người dùng";
+    int i = (Model.PageNumber - 1) * Model.PageSize;
+}
+
+<div class="container">
+    <h2 class="text-center">QUẢN LÝ NGƯỜI DÙNG</h2>
+    <div class="row">
+        <div class="col-lg-8">
+            <a href="@Url.Action("Create")" class="btn btn-primary mb-3">Thêm mới</a>
+        </div>
+        <div class="col-lg-4">
+            @using (Html.BeginForm("Index", "User", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <div class="form-group">
+                    <label for="searchString" class="mr-2">Tìm kiếm:</label>
+                    <input type="text" name="searchString" class="form-control mr-2" value="@ViewBag.SearchString" placeholder="Họ tên hoặc Tên đăng nhập" />
+                    <button type="submit" class="btn btn-info">Lọc</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Họ tên</th>
+                <th>Tên đăng nhập</th>
+                <th>Điện thoại</th>
+                <th>Email</th>
+                <th>Đơn vị</th>
+                <th>Trạng thái</th>
+                <th>Vai trò</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                i = i + 1;
+                <tr>
+                    <td>@i</td>
+                    <td>@user.HO_TEN</td>
+                    <td>@user.USERNAME</td>
+                    <td>@user.DIEN_THOAI</td>
+                    <td>@user.EMAIL</td>
+                    <td>@(user.DON_VI1 != null ? user.DON_VI1.TEN_DON_VI : user.DON_VI)</td>
+                    <td>
+                        @if (user.TRANG_THAI == "Hoạt động")
+                        {
+                            <span class="badge badge-success">@user.TRANG_THAI</span>
+                        }
+                        else if (user.TRANG_THAI == "Tạm ngưng")
+                        {
+                            <span class="badge badge-warning">@user.TRANG_THAI</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">@user.TRANG_THAI</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.VAI_TRO == "Admin")
+                        {
+                            <span class="badge badge-danger">@user.VAI_TRO</span>
+                        }
+                        else if (user.VAI_TRO == "Leader")
+                        {
+                            <span class="badge badge-info">@user.VAI_TRO</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary">@user.VAI_TRO</span>
+                        }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Edit", new { id = user.ID })" class="btn btn-sm btn-warning">Sửa</a>
+                        <a href="@Url.Action("Delete", new { id = user.ID })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.PageCount > 1)
+    {
+        <div class="text-center">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewBag.SearchString }))
+        </div>
+    }
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../Content/assets/css/style.css">
+}

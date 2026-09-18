@@ -1,0 +1,183 @@
+@model CT_Dashboard.Models.BAO_CAO
+@{
+    ViewBag.Title = "Duyệt/Từ chối báo cáo";
+}
+
+<div class="container">
+    <h2 class="text-center">DUYỆT/TỪ CHỐI BÁO CÁO</h2>
+
+    @* Hiển thị thông báo *@
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Thông tin báo cáo</h4>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Tên báo cáo:</label>
+                <div class="form-control-plaintext"><strong>@Model.TEN_BC</strong></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Năm:</label>
+                        <div class="form-control-plaintext">@Model.NAM</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Tháng:</label>
+                        <div class="form-control-plaintext">@Model.THANG</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Ngày:</label>
+                        <div class="form-control-plaintext">
+                            @if (Model.NGAY.HasValue)
+                            {
+                                @Model.NGAY.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <text>Chưa có</text>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Diễn giải:</label>
+                <div class="form-control-plaintext">@Model.DIEN_GIAI</div>
+            </div>
+
+            <div class="form-group">
+                <label>Trạng thái chi tiết:</label>
+                <div class="form-control-plaintext">
+                    @if (Model.BAO_CAO_CHI_TIET != null && Model.BAO_CAO_CHI_TIET.Count > 0)
+                    {
+                        <span class="badge badge-success">Đã nhập chi tiết (@Model.BAO_CAO_CHI_TIET.Count mục)</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-warning">Chưa nhập chi tiết</span>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <a href="@Url.Action("IndexChiTiet", new { id = Model.ID })" class="btn btn-info btn-sm">
+                    <i class="fa fa-eye"></i> Xem chi tiết báo cáo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-warning">
+            <h4 class="mb-0">Quyết định duyệt</h4>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("DuyetBaoCaoForm", "BaoCao", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.ID)
+
+                <div class="row">
+                    <!-- Duyệt báo cáo -->
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5><i class="fa fa-check"></i> Duyệt báo cáo</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Xác nhận duyệt báo cáo này. Sau khi duyệt, dữ liệu sẽ được hiển thị trên biểu đồ và không thể chỉnh sửa.</p>
+                                <button type="submit" name="action" value="duyet" class="btn btn-success btn-block"
+                                        onclick="return confirm('Khi duyệt báo cáo này thì các báo cáo cũ cùng tháng sẽ bị vô hiệu hóa, dữ liệu báo cáo này sẽ hiển thị lên biểu đồ. Bạn có chắc muốn duyệt?')">
+                                    <i class="fa fa-check"></i> Duyệt báo cáo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Từ chối báo cáo -->
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h5><i class="fa fa-times"></i> Từ chối báo cáo</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="lyDoTuChoi">Lý do từ chối: <span class="text-danger">*</span></label>
+                                    <textarea name="lyDoTuChoi" id="lyDoTuChoi" class="form-control" rows="4"
+                                              placeholder="Nhập lý do từ chối báo cáo..."></textarea>
+                                </div>
+                                <button type="submit" name="action" value="tuchoi" class="btn btn-danger btn-block"
+                                        onclick="return validateTuChoi()">
+                                    <i class="fa fa-times"></i> Từ chối báo cáo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="text-center mt-3">
+                @Html.ActionLink("Quay lại danh sách", "DuyetBaoCao", null, new { @class = "btn btn-secondary" })
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        function validateTuChoi() {
+            var lyDo = document.getElementById('lyDoTuChoi').value.trim();
+            if (lyDo === '') {
+                alert('Vui lòng nhập lý do từ chối!');
+                document.getElementById('lyDoTuChoi').focus();
+                return false;
+            }
+            return confirm('Bạn có chắc chắn muốn từ chối báo cáo này?\n\nLý do: ' + lyDo);
+        }
+    </script>
+}
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <style>
+        .form-control-plaintext {
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            font-size: 12px;
+        }
+    </style>
+}

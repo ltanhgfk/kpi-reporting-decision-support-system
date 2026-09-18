@@ -1,0 +1,112 @@
+@model CT_Dashboard.Models.BAO_CAO
+@{
+    ViewBag.Title = "Chuyển lãnh đạo";
+}
+<div class="container">
+    <h2 class="text-center">CHUYỂN LÃNH ĐẠO KÝ BÁO CÁO</h2>
+
+    @* Hiển thị thông báo lỗi nếu có *@
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @using (Html.BeginForm("ChuyenLanhDao", "BaoCao", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="container">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.Label("TEN_BC", "Tên báo cáo")
+                <div class="form-control-plaintext">@Html.DisplayFor(model => model.TEN_BC)</div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("NAM", "Năm")
+                <div class="form-control-plaintext">@Html.DisplayFor(model => model.NAM)</div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("THANG", "Tháng")
+                <div class="form-control-plaintext">@Html.DisplayFor(model => model.THANG)</div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("NGAY", "Ngày")
+                <div class="form-control-plaintext">
+                    @if (Model.NGAY.HasValue)
+                    {
+                        @Model.NGAY.Value.ToString("dd/MM/yyyy")
+                    }
+                    else
+                    {
+                        <text>Chưa có</text>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("DIEN_GIAI", "Diễn giải")
+                <div class="form-control-plaintext">@Html.DisplayFor(model => model.DIEN_GIAI)</div>
+            </div>
+
+            <div class="form-group">
+                <label class="text-danger">Xác nhận chuyển lãnh đạo</label>
+                <div class="form-control-plaintext text-warning">
+                    <strong>Lưu ý:</strong> Sau khi chuyển lãnh đạo, bạn sẽ không thể chỉnh sửa báo cáo này nữa!
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="btn-save">
+                    <input type="submit" value="Xác nhận chuyển" class="btn btn-success"
+                           onclick="return confirm('Bạn có chắc chắn muốn chuyển báo cáo này cho lãnh đạo không?')" />
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ml-2" })
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    <style>
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                width: 180px;
+                margin-bottom: 0;
+                font-weight: bold;
+            }
+
+        .form-control-plaintext {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .btn-save {
+            margin-left: 180px;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+}

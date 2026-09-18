@@ -1,0 +1,96 @@
+@model PagedList.IPagedList<CT_Dashboard.Models.DIA_BAN>
+
+@using CT_Dashboard.Models;
+@using PagedList.Mvc;
+
+@{
+    CT_DASHBOARDEntities db = new CT_DASHBOARDEntities();
+    ViewBag.Title = "Quản lý Địa bàn";
+    int i = (Model.PageNumber - 1) * Model.PageSize;
+}
+<div class="container">
+    <h2 class="text-center">QUẢN LÝ ĐỊA BÀN</h2>
+    <div class="row">
+        <div class="col-lg-8">
+            <a href="@Url.Action("Create")" class="btn btn-primary mb-3">Thêm mới</a>
+            <a href="@Url.Action("Import")" class="btn btn-primary mb-3">Nhập dữ liệu từ excel</a>
+        </div>
+        <div class="col-lg-4">
+            @using (Html.BeginForm("Index", "DiaBan", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <div class="form-group">
+                    <label for="searchString" class="mr-2">Tìm kiếm:</label>
+                    <input type="text" name="searchString" class="form-control mr-2" value="@ViewBag.SearchString" placeholder="Mã hoặc Tên địa bàn" />
+                    <button type="submit" class="btn btn-info">Lọc</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Mã địa bàn</th>
+                <th>Tên địa bàn</th>
+                <th>Vị trí</th>
+                <th>Trạng thái</th>
+                <th>Quan trọng</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                i = i + 1;
+                <tr>
+                    <td>@i</td>
+                    <td>@item.MA_DIA_BAN</td>
+                    <td>@item.TEN_DIA_BAN</td>
+                    <td class="text-center">@item.VI_TRI</td>
+                    <td>
+                        @if (item.TRANG_THAI == "Hoạt động")
+                        {
+                            <span class="badge badge-success">@item.TRANG_THAI</span>
+                        }
+                        else if (item.TRANG_THAI == "Tạm ngưng")
+                        {
+                            <span class="badge badge-warning">@item.TRANG_THAI</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary">@item.TRANG_THAI</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        @if (item.QUAN_TRONG == true)
+                        {
+                            <span class="badge badge-danger">Quan trọng</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-light">Bình thường</span>
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Sửa", "Edit", new { id = item.ID }, new { @class = "btn btn-sm btn-warning" })
+                        @Html.ActionLink("Xóa", "Delete", new { id = item.ID }, new { @class = "btn btn-sm btn-danger", onclick = "return confirm('Bạn có chắc chắn muốn xóa địa bàn này?');" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.PageCount > 1)
+    {
+        <div class="text-center">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewBag.SearchString }))
+        </div>
+    }
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../Content/assets/css/style.css">
+}

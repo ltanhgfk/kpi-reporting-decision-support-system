@@ -1,0 +1,538 @@
+@model List<CT_Dashboard.Models.BaoCaoViewModel>
+@{
+    ViewBag.Title = "Chi tiết thu ngân sách theo nguồn thu, sắc thuế";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        color: #333;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+    .revenue-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+        .revenue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+    .revenue-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+
+    .chart-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+
+    .performance-indicator {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: bold;
+    }
+
+    .indicator-excellent {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .indicator-good {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .indicator-poor {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .trend-up {
+        color: #28a745;
+    }
+
+    .trend-down {
+        color: #dc3545;
+    }
+
+    .trend-neutral {
+        color: #6c757d;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="detail-header text-center">
+        <div class="container">
+            <h1 class="mb-2">
+                <i class="mdi mdi-chart-line"></i>
+                @ViewBag.TieuDe
+            </h1>
+            <p class="mb-0">
+                <i class="mdi mdi-calendar-clock"></i>
+                Cập nhật: @ViewBag.NgayCapNhat | Tháng @ViewBag.Thang/@ViewBag.Nam
+            </p>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+        @{
+            var tongThucHien = Model.Sum(x => x.ThucHien);
+            var tongKeHoach = Model.Sum(x => x.KeHoach);
+            var tongCungKy = Model.Sum(x => x.CungKy);
+            var tyLeTrungBinh = tongKeHoach > 0 ? Math.Round((tongThucHien / tongKeHoach) * 100, 1) : 0;
+            var tangTruongSoVoiCungKy = tongCungKy > 0 ? Math.Round(((tongThucHien - tongCungKy) / tongCungKy) * 100, 1) : 0;
+        }
+
+        <div class="col-md-3">
+            <div class="card revenue-card text-center" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                <div class="card-body text-white">
+                    <i class="mdi mdi-cash-multiple revenue-icon"></i>
+                    <h3>@tongThucHien.ToString("N0")</h3>
+                    <p class="mb-0">Tổng thu thực hiện</p>
+                    <small>triệu đồng</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card revenue-card text-center" style="background: linear-gradient(45deg, #f093fb, #f5576c);">
+                <div class="card-body text-white">
+                    <i class="mdi mdi-target revenue-icon"></i>
+                    <h3>@tongKeHoach.ToString("N0")</h3>
+                    <p class="mb-0">Tổng kế hoạch</p>
+                    <small>triệu đồng</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card revenue-card text-center" style="background: linear-gradient(45deg, #4facfe, #00f2fe);">
+                <div class="card-body text-white">
+                    <i class="mdi mdi-percent revenue-icon"></i>
+                    <h3>@tyLeTrungBinh%</h3>
+                    <p class="mb-0">Tỷ lệ hoàn thành</p>
+                    <small>so với kế hoạch</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card revenue-card text-center" style="background: linear-gradient(45deg, #43e97b, #38f9d7);">
+                <div class="card-body text-white">
+                    <i class="mdi mdi-trending-up revenue-icon"></i>
+                    <h3>
+                        @if (tangTruongSoVoiCungKy >= 0)
+                        {
+                            <text>+@tangTruongSoVoiCungKy%</text>
+                        }
+                        else
+                        {
+                            <text>@tangTruongSoVoiCungKy%</text>
+                        }
+                    </h3>
+                    <p class="mb-0">So với cùng kỳ</p>
+                    <small>tăng trưởng</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="chart-section">
+                <h5 class="text-center mb-3">
+                    <i class="mdi mdi-chart-bar"></i>
+                    Biểu đồ so sánh thu theo từng nguồn thu
+                </h5>
+                <canvas id="revenueComparisonChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="chart-section">
+                <h5 class="text-center mb-3">
+                    <i class="mdi mdi-chart-donut"></i>
+                    Cơ cấu thu theo nguồn
+                </h5>
+                <canvas id="revenueStructureChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="chart-section">
+                <h5 class="mb-3">
+                    <i class="mdi mdi-chart-line-variant"></i>
+                    Phân tích hiệu suất từng nguồn thu
+                </h5>
+                <div class="row">
+                    @foreach (var item in Model.OrderByDescending(x => x.TyLeHoanThanh).Take(8))
+                    {
+                        var performanceClass = item.TyLeHoanThanh >= 100 ? "indicator-excellent" :
+                                             item.TyLeHoanThanh >= 80 ? "indicator-good" : "indicator-poor";
+                        var trendClass = item.CungKy > 0 ?
+                            (item.ThucHien > item.CungKy ? "trend-up" :
+                             item.ThucHien < item.CungKy ? "trend-down" : "trend-neutral") : "trend-neutral";
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">@item.TenChiTieu</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Thực hiện: <strong>@item.ThucHien.ToString("N0")</strong></span>
+                                        <span class="performance-indicator @performanceClass">
+                                            @item.TyLeHoanThanh%
+                                        </span>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 6px;">
+                                        <div class="progress-bar"
+                                             style="width: @(Math.Min(item.TyLeHoanThanh, 100))%; background: linear-gradient(90deg, #667eea, #764ba2);"
+                                             role="progressbar"></div>
+                                    </div>
+                                    <small class="@trendClass">
+                                        @if (item.CungKy > 0)
+                                        {
+                                            var change = Math.Round(((item.ThucHien - item.CungKy) / item.CungKy) * 100, 1);
+                                            if (change > 0)
+                                            {
+                                                <i class="mdi mdi-trending-up"></i><text> +@change% so với cùng kỳ</text>
+                                            }
+                                            else if (change < 0)
+                                            {
+                                                <i class="mdi mdi-trending-down"></i><text> @change% so với cùng kỳ</text>
+                                            }
+                                            else
+                                            {
+                                                <i class="mdi mdi-trending-neutral"></i><text> Không đổi so với cùng kỳ</text>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <text>Không có dữ liệu cùng kỳ</text>
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Data Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-gradient" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
+                    <h5 class="mb-0">
+                        <i class="mdi mdi-table-large"></i>
+                        Bảng chi tiết theo từng nguồn thu
+                        <div class="float-right">
+                            <button class="btn btn-light btn-sm mr-2" onclick="exportToExcel()">
+                                <i class="mdi mdi-file-excel"></i> Xuất Excel
+                            </button>
+                            <button class="btn btn-light btn-sm" onclick="printReport()">
+                                <i class="mdi mdi-printer"></i> In báo cáo
+                            </button>
+                        </div>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="revenueDetailTable" class="table table-hover">
+                            <thead style="background: linear-gradient(45deg, #f8f9ff, #e6eeff);">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Nguồn thu</th>
+                                    <th class="text-right">Thực hiện (triệu đồng)</th>
+                                    <th class="text-right">Kế hoạch (triệu đồng)</th>
+                                    <th class="text-right">Cùng kỳ (triệu đồng)</th>
+                                    <th class="text-center">Tỷ lệ hoàn thành</th>
+                                    <th class="text-center">Tăng trưởng</th>
+                                    <th class="text-center">Tiến độ</th>
+                                    <th class="text-center">Đánh giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int stt = 1;}
+                                @foreach (var item in Model)
+                                {
+                                    var tyLe = item.KeHoach > 0 ? Math.Round((item.ThucHien / item.KeHoach) * 100, 1) : 0;
+                                    var tangTruong = item.CungKy > 0 ? Math.Round(((item.ThucHien - item.CungKy) / item.CungKy) * 100, 1) : 0;
+                                    var danhGia = tyLe >= 100 ? "Xuất sắc" : tyLe >= 90 ? "Tốt" : tyLe >= 80 ? "Khá" : "Cần cải thiện";
+                                    var badgeClass = tyLe >= 100 ? "success" : tyLe >= 90 ? "info" : tyLe >= 80 ? "warning" : "danger";
+
+                                    <tr>
+                                        <td><span class="badge badge-light">@stt</span></td>
+                                        <td>
+                                            <strong>@item.TenDayDu</strong>
+                                            <br>
+                                            <small class="text-muted">@item.MaChiTieu</small>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong style="color: #667eea;">@item.ThucHien.ToString("N1")</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong>@item.KeHoach.ToString("N1")</strong>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong style="color: #6c757d;">@item.CungKy.ToString("N1")</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-@badgeClass text-white px-3 py-1">
+                                                @tyLe%
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (tangTruong > 0)
+                                            {
+                                                <span class="text-success font-weight-bold">
+                                                    <i class="mdi mdi-arrow-up"></i> +@tangTruong%
+                                                </span>
+                                            }
+                                            else if (tangTruong < 0)
+                                            {
+                                                <span class="text-danger font-weight-bold">
+                                                    <i class="mdi mdi-arrow-down"></i> @tangTruong%
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    <i class="mdi mdi-minus"></i> 0%
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="progress mx-auto" style="width: 80px; height: 8px;">
+                                                <div class="progress-bar bg-@badgeClass"
+                                                     style="width: @(Math.Min(tyLe, 100))%"
+                                                     title="@tyLe% hoàn thành"></div>
+                                            </div>
+                                            <small>@tyLe%</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-@badgeClass text-white">
+                                                @danhGia
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#revenueDetailTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json"
+                },
+                "order": [[ 5, "desc" ]], // Sort by completion rate
+                "pageLength": 25,
+                "responsive": true,
+                "scrollX": true
+            });
+
+            // Chart data preparation
+            var labels = [@Html.Raw(string.Join(",", Model.Select(x => "'" + x.TenChiTieu?.Replace("'", "\\'") + "'")))];
+            var thucHienData = [@Html.Raw(string.Join(",", Model.Select(x => x.ThucHien)))];
+            var keHoachData = [@Html.Raw(string.Join(",", Model.Select(x => x.KeHoach)))];
+            var cungKyData = [@Html.Raw(string.Join(",", Model.Select(x => x.CungKy)))];
+
+            // Revenue Comparison Chart
+            var ctx1 = document.getElementById('revenueComparisonChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Thực hiện',
+                        data: thucHienData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }, {
+                        label: 'Kế hoạch',
+                        data: keHoachData,
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: 'rgba(118, 75, 162, 1)',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }, {
+                        label: 'Cùng kỳ năm trước',
+                        data: cungKyData,
+                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' +
+                                           new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' triệu đồng';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('vi-VN').format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Revenue Structure Pie Chart
+            var ctx2 = document.getElementById('revenueStructureChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: thucHienData,
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                            '#FA8072', '#20B2AA', '#9370DB', '#3CB371'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    var percentage = Math.round((context.parsed / total) * 100);
+                                    return context.label + ': ' +
+                                           new Intl.NumberFormat('vi-VN').format(context.parsed) +
+                                           ' triệu đồng (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Export to Excel function
+        function exportToExcel() {
+            var wb = XLSX.utils.book_new();
+            var ws_data = [
+                ['STT', 'Mã nguồn thu', 'Tên nguồn thu', 'Thực hiện', 'Kế hoạch', 'Cùng kỳ', 'Tỷ lệ HT (%)', 'Tăng trưởng (%)', 'Đơn vị tính']
+            ];
+
+            @{int exportStt = 1;}
+            @foreach (var item in Model)
+            {
+                var tyLe = item.KeHoach > 0 ? Math.Round((item.ThucHien / item.KeHoach) * 100, 1) : 0;
+                var tangTruong = item.CungKy > 0 ? Math.Round(((item.ThucHien - item.CungKy) / item.CungKy) * 100, 1) : 0;
+                <text>
+                ws_data.push([
+                    @exportStt,
+                    '@Html.Raw(item.MaChiTieu?.Replace("'", "\\'"))',
+                    '@Html.Raw(item.TenChiTieu?.Replace("'", "\\'"))',
+                    @item.ThucHien,
+                    @item.KeHoach,
+                    @item.CungKy,
+                    @tyLe,
+                    @tangTruong,
+                    '@Html.Raw(item.DonViTinh?.Replace("'", "\\'"))'
+                ]);
+                </text>
+                exportStt++;
+            }
+
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Chi tiết theo nguồn thu");
+
+            var today = new Date();
+            var filename = "ChiTiet_NguonThu_" + today.getFullYear() +
+                          (today.getMonth() + 1).toString().padStart(2, '0') +
+                          today.getDate().toString().padStart(2, '0') + ".xlsx";
+
+            XLSX.writeFile(wb, filename);
+        }
+
+        // Print report function
+        function printReport() {
+            window.print();
+        }
+    </script>
+
+    <style media="print">
+        .btn, .no-print {
+            display: none !important;
+        }
+
+        .card {
+            border: 1px solid #ddd !important;
+        }
+
+        body {
+            font-size: 12px;
+        }
+    </style>
+}

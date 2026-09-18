@@ -1,0 +1,30 @@
+@model CT_Dashboard.Models.BAO_CAO
+@{
+    ViewBag.Title = "Xóa Báo Cáo";
+}
+<h2>Xóa Báo Cáo</h2>
+<h3>Bạn có chắc muốn xóa báo cáo này?</h3>
+<div>
+    <dl class="dl-horizontal">
+        <dt>@Html.DisplayNameFor(model => model.DON_VI1.TEN_DON_VI)</dt>
+        <dd>@Html.DisplayFor(model => model.DON_VI1.MA_DON_VI)</dd>
+        <dt>@Html.DisplayNameFor(model => model.NAM)</dt>
+        <dd>@Html.DisplayFor(model => model.NAM)</dd>
+        <dt>@Html.DisplayNameFor(model => model.THANG)</dt>
+        <dd>@Html.DisplayFor(model => model.THANG)</dd>
+        <dt>@Html.DisplayNameFor(model => model.NGAY)</dt>
+        <dd>@Html.DisplayFor(model => model.NGAY)</dd>
+    </dl>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-actions no-color">
+            <input type="submit" value="Xóa" class="btn btn-danger" /> |
+            @Html.ActionLink("Quay lại", "Index")
+        </div>
+    }
+</div>
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+}

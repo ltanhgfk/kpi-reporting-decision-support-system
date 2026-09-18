@@ -1,0 +1,99 @@
+﻿@model CT_Dashboard.Models.NGUOI_DUNG
+
+@{
+    ViewBag.Title = "Cập nhật người dùng";
+}
+<div class="container">
+    <h2 class="text-center">CẬP NHẬT NGƯỜI DÙNG</h2>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.HO_TEN, "Họ và tên")
+            @Html.TextBoxFor(model => model.HO_TEN, new { @class = "form-control", maxlength = "100", required = "required" })
+            @Html.ValidationMessageFor(model => model.HO_TEN, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DIEN_THOAI, "Điện thoại")
+            @Html.TextBoxFor(model => model.DIEN_THOAI, new { @class = "form-control", maxlength = "15", type = "tel" })
+            @Html.ValidationMessageFor(model => model.DIEN_THOAI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EMAIL, "Email")
+            @Html.TextBoxFor(model => model.EMAIL, new { @class = "form-control", maxlength = "100", type = "email" })
+            @Html.ValidationMessageFor(model => model.EMAIL, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DON_VI, "Đơn vị")
+            @Html.DropDownListFor(model => model.DON_VI,
+                new SelectList(ViewBag.DonViList, "Value", "Text"),
+                "-- Chọn đơn vị --",
+                new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.DON_VI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TRANG_THAI, "Trạng thái")
+            @Html.DropDownListFor(model => model.TRANG_THAI,
+                new List<SelectListItem>
+                {
+                    //new SelectListItem { Text = "Hoạt động", Value = "Hoạt động" },
+                    //new SelectListItem { Text = "Khóa", Value = "Khóa" },
+                    //new SelectListItem { Text = "Tạm ngưng", Value = "Tạm ngưng" }
+                    new SelectListItem { Text = "Hoạt động", Value = "Active", Selected = true },
+                    new SelectListItem { Text = "Khóa", Value = "Inactive" },
+                    new SelectListItem { Text = "Tạm ngưng", Value = "Temp" }
+                },
+                "-- Chọn trạng thái --",
+                new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.TRANG_THAI, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.VAI_TRO, "Vai trò")
+            @Html.DropDownListFor(model => model.VAI_TRO,
+                new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "Admin", Value = "Admin" },
+                    new SelectListItem { Text = "User", Value = "User" },
+                    new SelectListItem { Text = "Leader", Value = "Leader" }
+                },
+                "-- Chọn vai trò --",
+                new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.VAI_TRO, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.USERNAME, "Tên đăng nhập")
+            @Html.TextBoxFor(model => model.USERNAME, new { @class = "form-control", maxlength = "100", @readonly = "readonly" })
+            <small class="form-text text-muted">Tên đăng nhập không thể thay đổi.</small>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("NewPassword", "Mật khẩu mới")
+            <input type="password" name="NewPassword" id="NewPassword" class="form-control" maxlength="100" />
+            <small class="form-text text-muted">Để trống nếu không muốn thay đổi mật khẩu. Mật khẩu mới sẽ được mã hóa tự động.</small>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
+            @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    }
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

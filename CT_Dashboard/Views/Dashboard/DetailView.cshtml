@@ -1,0 +1,59 @@
+@using CT_Dashboard.Models
+@{
+    ViewBag.Title = ViewBag.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var data = Model as List<ChiTieuDetailViewModel>;
+}
+
+<div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="row">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card position-relative">
+                        <div class="card-body">
+                            <h3 class="font-weight-bold">@ViewBag.Title</h3>
+                            <a href="@Url.Action("Dashboard", "Dashboard")" class="btn btn-primary mb-3">
+                                <i class="ti-arrow-left"></i> Quay lại Dashboard
+                            </a>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>@((ViewBag.DataType == "diaban") ? "Địa bàn" : "Chỉ tiêu")</th>
+                                            <th>Thực hiện (Lũy kế)</th>
+                                            <th>Kế hoạch</th>
+                                            <th>Cùng kỳ</th>
+                                            <th>Đơn vị tính</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (data != null && data.Any())
+                                        {
+                                            foreach (var item in data)
+                                            {
+                                                <tr>
+                                                    <td>@((ViewBag.DataType == "diaban") ? item.TenDiaBan : item.TenChiTieu)</td>
+                                                    <td>@string.Format("{0:N0}", item.ThucHien)</td>
+                                                    <td>@string.Format("{0:N0}", item.KeHoach)</td>
+                                                    <td>@string.Format("{0:N0}", item.CungKy)</td>
+                                                    <td>@item.DonViTinh</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center">Không có dữ liệu để hiển thị.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

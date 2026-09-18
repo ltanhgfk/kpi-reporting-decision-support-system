@@ -1,0 +1,112 @@
+@*@model IEnumerable<CT_Dashboard.Models.BAO_CAO>*@
+@model PagedList.IPagedList<CT_Dashboard.Models.BAO_CAO_CHI_TIET>
+@using CT_Dashboard.Models;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Quản lý Báo cáo chi tiết";
+    int i = 0;
+    int id = ViewBag.ID_BAO_CAO;
+    int count = Model.Count;
+
+    // Lấy thông tin user hiện tại
+    var currentUser = Session["User"] as CT_Dashboard.Models.NGUOI_DUNG;
+    bool isNVDTPC = currentUser?.DON_VI1?.TEN_DON_VI == "NVDTPC" || currentUser?.DON_VI1?.MA_DON_VI == "NVDTPC";
+}
+<div class="container">
+    <h2 class="text-center">QUẢN LÝ CHI TIẾT BÁO CÁO</h2>
+    <div class="row">
+        @if (count <= 0)
+        {
+            <div class="col-lg-8"><a href="@Url.Action("Import", new { id = id })" class="btn btn-primary mb-3">Nhập báo cáo chi tiết</a></div>
+        }
+        <div class="col-lg-4">
+            @using (Html.BeginForm("IndexChiTiet", "BaoCao", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <div class="form-group">
+                    <label for="searchString" class="mr-2">Tìm kiếm:</label>
+                    <input type="text" name="searchString" class="form-control mr-2" value="@ViewBag.SearchString" placeholder="Tên đơn vị hoặc Tên chỉ tiêu" />
+                    <button type="submit" class="btn btn-info">Lọc</button>
+                </div>
+            }
+        </div>
+    </div>
+    <h3 class="text-center">@ViewBag.TEN_BAO_CAO</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>STT</th>
+            <th class="text-center">Địa bàn</th>
+            <th class="text-center">Chỉ tiêu</th>
+
+            @if (isNVDTPC)
+            {
+                <th class="text-wrap text-center">Thực hiện trong kỳ</th>
+                <th class="text-wrap text-center">Thực hiện (lũy kế)</th>
+                <th class="text-wrap text-center">Kế hoạch</th>
+                <th class="text-wrap text-center">Cùng kỳ</th>
+            }
+            else
+            {
+                <th class="text-wrap text-center">Thực hiện</th>
+                <th class="text-wrap text-center">Chi tiết</th>
+            }
+        </tr>
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            <tr>
+                <td class="text-center">@i</td>
+                <td class="text">@item.DIA_BAN1.TEN_DIA_BAN</td>
+                <td class="text-wrap">@item.CHI_TIEU1.TEN_CHI_TIEU</td>
+
+                @if (isNVDTPC)
+                {
+                    <td class="text-center">@item.THUC_HIEN_TRONG_KY</td>
+                    <td class="text-center">@item.THUC_HIEN</td>
+                    <td class="text-center">@item.KE_HOACH</td>
+                    <td class="text-center">@item.CUNG_KY</td>
+                }
+                else
+                {
+                    <td class="text-center">@item.THUC_HIEN</td>
+                    <td class="text-wrap text-center">@item.DIEN_GIAI</td>
+                }
+            </tr>
+        }
+    </table>
+
+    @* Sửa nút Quay lại - kiểm tra vai trò để quyết định trang đích *@
+    @{
+        string backUrl = "";
+        string backText = "Quay lại";
+
+        if (currentUser?.VAI_TRO == "Leader")
+        {
+            backUrl = Url.Action("DuyetBaoCao", "BaoCao");
+            backText = "Quay lại trang duyệt";
+        }
+        else if (currentUser?.VAI_TRO == "User")
+        {
+            backUrl = Url.Action("Index", "BaoCao");
+            backText = "Quay lại danh sách báo cáo";
+        }
+        else
+        {
+            backUrl = Url.Action("Index", "BaoCao");
+            backText = "Quay lại";
+        }
+    }
+
+    <div class="mt-3">
+        <a href="@backUrl" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> @backText
+        </a>
+    </div>
+
+    @Html.PagedListPager(Model, page => Url.Action("IndexChiTiet", new { page, searchString = ViewBag.SearchString }))
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+</div>
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+}
