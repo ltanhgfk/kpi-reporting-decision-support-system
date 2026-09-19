@@ -1,0 +1,63 @@
+@model PagedList.IPagedList<CT_Dashboard.Models.DON_VI>
+
+@using CT_Dashboard.Models;
+@using PagedList.Mvc;
+
+@{
+    CT_DASHBOARDEntities db = new CT_DASHBOARDEntities();
+    ViewBag.Title = "Quản lý Địa bàn";
+    int i = 0;
+}
+<div class="container">
+    <h2 class="text-center">QUẢN LÝ ĐỊA BÀN</h2>
+    <div class="row">
+        <div class="col-lg-8"><a href="@Url.Action("Create")" class="btn btn-primary mb-3">Thêm mới</a>
+                              <a href="@Url.Action("Import")" class="btn btn-primary mb-3">Nhập dữ liệu từ excel</a>
+        </div>        
+        <div class="col-lg-4">
+            @using (Html.BeginForm("Index", "DonVi", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <div class="form-group">
+                    <label for="searchString" class="mr-2">Tìm kiếm:</label>
+                    <input type="text" name="searchString" class="form-control mr-2" value="@ViewBag.SearchString" placeholder="Mã hoặc Tên đơn vị" />
+                    <button type="submit" class="btn btn-info">Lọc</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>STT</th>
+            <th>Mã đơn vị</th>
+            <th>Tên đơn vị</th>
+            @*<th>Địa bàn cấp trên</th>*@
+            <th>Vị trí</th>
+            @*<th>Ghi chú</th>*@
+            <th>Thao tác</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            <tr>
+                <td>@i</td>
+                <td>@item.MA_DON_VI</td>
+                <td>@item.TEN_DON_VI</td>
+                @*<td>@(item.PARENTID !=null ? db.DON_VI.Find(item.PARENTID)?.TEN_DON_VI : "")</td>*@
+                <td>@item.VI_TRI</td>
+                @*<td>@item.GHI_CHU</td>*@
+                <td>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.ID }, new { @class = "btn btn-sm btn-warning" }) |
+                    @Html.ActionLink("Xóa", "Delete", new { id = item.ID }, new { @class = "btn btn-sm btn-danger" })
+                </td>
+            </tr>
+        }
+    </table>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewBag.SearchString }))
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+</div>
+
+@section styles {
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />   
+    <link rel="stylesheet" href="../Content/assets/css/style.css">   
+}

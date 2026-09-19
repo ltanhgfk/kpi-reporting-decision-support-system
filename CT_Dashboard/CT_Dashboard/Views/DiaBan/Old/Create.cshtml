@@ -1,0 +1,60 @@
+@model CT_Dashboard.Models.DIA_BAN
+@{
+    ViewBag.Title = "Thêm Địa bàn";
+}
+<div class="container">
+    <h2 class="text-center">THÊM ĐỊA BÀN</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.MA_DIA_BAN)
+                
+                    @Html.EditorFor(model => model.MA_DIA_BAN, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.MA_DIA_BAN)
+                
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.TEN_DIA_BAN)
+                
+                    @Html.EditorFor(model => model.TEN_DIA_BAN, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.TEN_DIA_BAN)
+                
+            </div>
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.PARENTID)
+                
+                    @Html.DropDownList("PARENTID", null, "Không có", htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.PARENTID)
+                
+            </div>*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.VI_TRI)
+                
+                    @Html.EditorFor(model => model.VI_TRI, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.VI_TRI)
+                
+            </div>
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.GHI_CHU)
+                
+                    @Html.EditorFor(model => model.GHI_CHU, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.GHI_CHU)
+                
+            </div>*@
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Thêm" class="btn btn-primary" />
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+    @section styles {
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="../Content/assets/css/style.css">
+    }

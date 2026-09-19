@@ -1,5 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0" DefaultTargets="Build">
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -277,9 +277,9 @@
     <Content Include="Content\assets\images\faces\face8.jpg" />
     <Content Include="Content\assets\images\faces\face9.jpg" />
     <Content Include="Content\assets\images\log.png" />
-    <Content Include="Content\assets\js\chart.js@4.4.0.js" />
-    <Content Include="Content\assets\js\chartjs-plugin-datalabels@2.0.0.js" />
-    <Content Include="Content\assets\js\chartjs-plugin-datalabels@2.2.0.js" />
+    <Content Include="Content\assets\js\chart.js%404.4.0.js" />
+    <Content Include="Content\assets\js\chartjs-plugin-datalabels%402.0.0.js" />
+    <Content Include="Content\assets\js\chartjs-plugin-datalabels%402.2.0.js" />
     <Content Include="Content\assets\js\dataTables.bootstrap5.min.js" />
     <Content Include="Content\assets\js\jquery-3.6.0.min.js" />
     <Content Include="Content\assets\js\jquery.dataTables.min.js" />
@@ -329,6 +329,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Files\SampleBaoCao.xlsx" />
+    <Content Include="Files\Uploads\SampleBaoCao.xlsx" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
@@ -444,10 +445,10 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\User\Create.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
-    <Content Include="Views\DonVi\create.cshtml" />
+    <Content Include="Views\DonVi\Create.cshtml" />
     <Content Include="Views\DonVi\Delete.cshtml" />
-    <Content Include="Views\DonVi\edit.cshtml" />
-    <Content Include="Views\DonVi\index.cshtml" />
+    <Content Include="Views\DonVi\Edit.cshtml" />
+    <Content Include="Views\DonVi\Index.cshtml" />
     <Content Include="Content\assets\css\maps\style.css.map" />
     <Content Include="Content\assets\fonts\Manrope\Manrope-Bold.eot" />
     <Content Include="Content\assets\fonts\Manrope\Manrope-Bold.ttf" />
@@ -626,8 +627,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\Temp\" />
-    <Folder Include="Models\Temp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -699,5 +698,10 @@
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
   <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
-  
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
 </Project>

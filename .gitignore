@@ -1,28 +1,32 @@
-# Visual Studio
+# Visual Studio / MSBuild
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+*.pubxml.user
 
 # Build output
-bin/
-obj/
-[Bb]uild/
+[Bb]in/
+[Oo]bj/
 
-# Packages restored by NuGet
+# NuGet (restored packages are regenerated from packages.config)
 packages/
+*.nupkg
 
-# Local/runtime data
-CT_Dashboard/Files/Uploads/
-CT_Dashboard/App_Data/
+# Runtime-generated report uploads (contains real submitted organizational data)
+# Keep the folder structure but ignore actual uploaded content.
+CT_Dashboard/CT_Dashboard/Files/Uploads/*
+!CT_Dashboard/CT_Dashboard/Files/Uploads/SampleBaoCao.xlsx
+!CT_Dashboard/CT_Dashboard/Files/Uploads/.gitkeep
 
-# Local configuration
-*.local
-*.secret
-.env
+# App_Data (local SQL Server files, if ever generated locally)
+App_Data/*.mdf
+App_Data/*.ldf
 
-# Logs
-*.log
+# Local publish profile history (contains local machine paths)
+Properties/PublishProfiles/*.pubxml.user
 
 # OS files
-.DS_Store
 Thumbs.db
+.DS_Store

@@ -1,0 +1,1415 @@
+@using System.Linq;
+@using System.Globalization;
+@using CT_Dashboard.Models;
+
+@{
+    ViewBag.Title = "Báo cáo kết quả thực hiện nhiệm vụ, công tác thuế";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var NhomChiTieu = ViewBag.NhomChiTieu as List<CT_Dashboard.Models.ChiTieuViewModel>;
+    var i = 0;
+
+    var TongThuNoiDia = ViewBag.TTND as BaoCaoViewModel;
+    var labelTongThu = new[] { "Thực hiện", "Còn lại" };
+    var valueTongThu = TongThuNoiDia != null ? new[] { TongThuNoiDia.ThucHien, TongThuNoiDia.Conlai } : new[] { 0D, 0D };
+
+    var TTRU = ViewBag.TTRU as BaoCaoViewModel;
+    var labelTTRU = new[] { "Thực hiện", "Còn lại" };
+    var valueTTRU = TTRU != null ? new[] { TTRU.ThucHien, TTRU.Conlai } : new[] { 0D, 0D };
+
+    var ChiTieuAll = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.ChiTieuAll;
+    var labelCTAll = ChiTieuAll.Select(x => x.TenChiTieu).ToArray();
+    var thuchienCTAll = ChiTieuAll.Select(x => x.ThucHien).ToArray();
+    var kehoachCTAll = ChiTieuAll.Select(x => x.KeHoach).ToArray();
+    var cungkyCTAll = ChiTieuAll.Select(x => x.CungKy).ToArray();
+
+    var DonViAll = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.DonViAll;
+    var labelDVAll = DonViAll.Select(x => x.MaDiaBan).ToArray();
+    var thuchienDVAll = DonViAll.Select(x => x.ThucHien).ToArray();
+    var kehoachDVAll = DonViAll.Select(x => x.KeHoach).ToArray();
+    var cungkyDVAll = DonViAll.Select(x => x.CungKy).ToArray();
+
+    var NgayBaoCaoDT = TongThuNoiDia?.NgaySoLieu?.ToString("dd/MM/yyyy") ?? "";
+
+    var DN = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.DN;
+    var HT = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.HT;
+    var KT = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.KT;
+    var NO = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.NO;
+    var HD = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.HD;
+    var CN = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.CN;
+    var HC = (List<CT_Dashboard.Models.BaoCaoViewModel>)ViewBag.HC;
+
+    var NgayBCQLDN = ViewBag.NgayBCQLDN;
+    var NgayBCKT = ViewBag.NgayBCKT;
+    var NgayBCCNTK = ViewBag.NgayBCCNTK;
+    var NgayBCVP = ViewBag.NgayBCVP;
+
+    // Tháng/Năm hiện tại từ dữ liệu
+    var currentThang = ViewBag.CurrentThang ?? (TongThuNoiDia?.NgaySoLieu?.Month ?? DateTime.Now.Month);
+    var currentNam = ViewBag.CurrentNam ?? (TongThuNoiDia?.NgaySoLieu?.Year ?? DateTime.Now.Year);
+
+    CultureInfo culture = new CultureInfo("vi-VN");
+    NumberFormatInfo nfi = culture.NumberFormat;
+}
+
+@section styles {
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/bootstrap.min.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/vendors/feather/feather.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/vendors/ti-icons/css/themify-icons.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/vendors/css/vendor.bundle.base.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/vendors/font-awesome/css/font-awesome.min.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/vendors/mdi/css/materialdesignicons.min.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/dataTables.bootstrap5.min.css")">
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/assets/js/select.dataTables.min.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    <link rel="shortcut icon" href="@Url.Content("~/Content/assets/images/favicon.png")" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =============================================
+           SPA CORE STYLES
+        ============================================= */
+        :root {
+            --spa-primary: #1a56db;
+            --spa-primary-light: #e8f0fe;
+            --spa-sidebar-bg: #0f172a;
+            --spa-sidebar-text: #94a3b8;
+            --spa-sidebar-active: #3b82f6;
+            --spa-sidebar-active-bg: rgba(59,130,246,0.12);
+            --spa-header-h: 64px;
+            --spa-sidebar-w: 260px;
+            --spa-transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+            --spa-radius: 12px;
+            --spa-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        /* Reset layout để dùng SPA layout */
+        .container-fluid.page-body-wrapper {
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ---- TOP HEADER BAR ---- */
+        #spa-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--spa-header-h);
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 20px 0 0;
+            z-index: 1050;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            gap: 0;
+        }
+
+        #spa-header .brand-area {
+            width: var(--spa-sidebar-w);
+            min-width: var(--spa-sidebar-w);
+            background: var(--spa-sidebar-bg);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 10px;
+            border-right: 1px solid rgba(255,255,255,0.07);
+        }
+
+        #spa-header .brand-area .brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, #3b82f6, #1a56db);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 16px; flex-shrink: 0;
+        }
+
+        #spa-header .brand-area .brand-text {
+            color: #fff;
+            font-size: 12.5px;
+            font-weight: 600;
+            line-height: 1.3;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+
+        #spa-header .brand-area .brand-text small {
+            display: block;
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: 10.5px;
+        }
+
+        #spa-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        #spa-header .header-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            margin-left: 20px;
+        }
+
+        /* ---- FILTER COMBOBOXES ---- */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 5px 12px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--spa-primary);
+            cursor: pointer;
+            outline: none;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            padding: 2px 4px;
+            min-width: 70px;
+        }
+
+        .filter-select:focus { outline: none; }
+
+        .btn-filter-apply {
+            background: var(--spa-primary);
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 6px 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--spa-transition);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .btn-filter-apply:hover { background: #1e40af; }
+        .btn-filter-apply i { font-size: 13px; }
+
+        .current-period-badge {
+            background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* ---- SIDEBAR ---- */
+        #spa-sidebar {
+            position: fixed;
+            top: var(--spa-header-h);
+            left: 0;
+            width: var(--spa-sidebar-w);
+            height: calc(100vh - var(--spa-header-h));
+            background: var(--spa-sidebar-bg);
+            overflow-y: auto;
+            z-index: 1040;
+            padding: 16px 0 40px;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            transition: transform var(--spa-transition);
+        }
+
+        #spa-sidebar::-webkit-scrollbar { width: 4px; }
+        #spa-sidebar::-webkit-scrollbar-track { background: transparent; }
+        #spa-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        #spa-sidebar .nav-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            color: #475569;
+            text-transform: uppercase;
+            padding: 10px 20px 6px;
+        }
+
+        #spa-sidebar .spa-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            color: var(--spa-sidebar-text);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--spa-transition);
+            border-left: 3px solid transparent;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            position: relative;
+        }
+
+        #spa-sidebar .spa-nav-link:hover {
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.05);
+            border-left-color: rgba(59,130,246,0.4);
+        }
+
+        #spa-sidebar .spa-nav-link.active {
+            color: #fff;
+            background: var(--spa-sidebar-active-bg);
+            border-left-color: var(--spa-sidebar-active);
+        }
+
+        #spa-sidebar .spa-nav-link .nav-icon {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.06);
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: background var(--spa-transition);
+        }
+
+        #spa-sidebar .spa-nav-link.active .nav-icon,
+        #spa-sidebar .spa-nav-link:hover .nav-icon {
+            background: rgba(59,130,246,0.2);
+            color: #93c5fd;
+        }
+
+        #spa-sidebar .nav-badge {
+            margin-left: auto;
+            background: rgba(59,130,246,0.2);
+            color: #93c5fd;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+        }
+
+        /* ---- MAIN CONTENT AREA ---- */
+        #spa-content {
+            margin-left: var(--spa-sidebar-w);
+            margin-top: var(--spa-header-h);
+            min-height: calc(100vh - var(--spa-header-h));
+            background: #f1f5f9;
+            padding: 0;
+        }
+
+        /* ---- SPA SECTIONS ---- */
+        .spa-section {
+            display: none;
+            padding: 24px;
+            animation: spaFadeIn 0.3s ease;
+        }
+
+        .spa-section.active {
+            display: block;
+        }
+
+        @@keyframes spaFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---- PAGE HEADING ---- */
+        .spa-page-heading {
+            margin-bottom: 20px;
+        }
+
+        .spa-page-heading h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+
+        .spa-page-heading p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* ---- CARD STYLES ---- */
+        .spa-card {
+            background: #fff;
+            border-radius: var(--spa-radius);
+            box-shadow: var(--spa-shadow);
+            border: 1px solid #f0f4f8;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .spa-card .card-header-custom {
+            padding: 16px 20px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .spa-card .card-header-custom .card-title-custom {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .spa-card .card-header-custom .card-title-custom .title-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--spa-primary);
+            flex-shrink: 0;
+        }
+
+        .spa-card .card-body-custom {
+            padding: 20px;
+        }
+
+        /* ---- METRIC CARDS ---- */
+        .metric-card {
+            background: #fff;
+            border-radius: var(--spa-radius);
+            border: 1px solid #f0f4f8;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: all var(--spa-transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--metric-color, #3b82f6), transparent);
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            border-color: var(--metric-color, #3b82f6);
+        }
+
+        .metric-card .metric-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+
+        .metric-card .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            line-height: 1.2;
+        }
+
+        .metric-card .metric-unit {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .metric-card .metric-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        .metric-card .metric-desc .desc-expand {
+            color: var(--spa-primary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Color variants for metric cards */
+        .metric-card.color-blue { --metric-color: #3b82f6; }
+        .metric-card.color-green { --metric-color: #10b981; }
+        .metric-card.color-orange { --metric-color: #f59e0b; }
+        .metric-card.color-red { --metric-color: #ef4444; }
+        .metric-card.color-purple { --metric-color: #8b5cf6; }
+        .metric-card.color-teal { --metric-color: #14b8a6; }
+        .metric-card.color-pink { --metric-color: #ec4899; }
+
+        /* ---- SECTION GROUP HEADERS ---- */
+        .section-group-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: var(--spa-radius);
+            padding: 16px 22px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all var(--spa-transition);
+        }
+
+        .section-group-header:hover {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .section-group-header.variant-primary {
+            background: linear-gradient(135deg, #1a56db, #1d4ed8);
+        }
+
+        .section-group-header.variant-success {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .section-group-header.variant-warning {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+
+        .section-group-header.variant-danger {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        .section-group-header.variant-secondary {
+            background: linear-gradient(135deg, #475569, #334155);
+        }
+
+        .section-group-header .group-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .section-group-header .group-title i {
+            font-size: 16px; opacity: 0.85;
+        }
+
+        .section-group-header .group-link-hint {
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.65);
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        /* ---- CHARTS CONTAINER ---- */
+        .chart-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .chart-wrapper canvas {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .chart-wrapper canvas:hover {
+            transform: scale(1.01);
+        }
+
+        /* ---- LOADING OVERLAY ---- */
+        #spa-loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        #spa-loading.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #spa-loading .loading-spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: var(--spa-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        #spa-loading .loading-text {
+            font-size: 14px;
+            color: #64748b;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 500;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- BACK TO TOP ---- */
+        #back-to-top {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--spa-primary);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 14px rgba(26,86,219,0.35);
+            transition: all 0.3s;
+            display: none;
+            align-items: center; justify-content: center;
+        }
+
+        #back-to-top:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @@media (max-width: 992px) {
+            #spa-sidebar {
+                transform: translateX(-100%);
+            }
+            #spa-sidebar.open {
+                transform: translateX(0);
+            }
+            #spa-content {
+                margin-left: 0;
+            }
+            #spa-header .brand-area {
+                width: auto;
+                min-width: auto;
+            }
+            .sidebar-toggle-btn {
+                display: flex !important;
+            }
+        }
+
+        .sidebar-toggle-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #1e293b;
+            font-size: 20px;
+            padding: 8px;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+
+        /* Divider trong sidebar */
+        .spa-sidebar-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 10px 16px;
+        }
+
+        /* ---- FILTER LOADING INDICATOR ---- */
+        .filter-refreshing {
+            animation: pulse 1s infinite;
+        }
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+}
+
+<!-- LOADING OVERLAY -->
+<div id="spa-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Đang tải dữ liệu...</div>
+</div>
+
+<!-- TOP HEADER -->
+<div id="spa-header">
+    <div class="brand-area">
+        <div class="brand-icon">
+            <i class="mdi mdi-chart-areaspline"></i>
+        </div>
+        <div class="brand-text">
+            Báo cáo tổng hợp
+            <small>Thuế thành phố Cần Thơ</small>
+        </div>
+    </div>
+
+    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Menu">
+        <i class="mdi mdi-menu"></i>
+    </button>
+
+    <span class="header-title d-none d-md-block">Kết quả thực hiện nhiệm vụ công tác thuế</span>
+
+    <div class="header-right">
+        <!-- Filter theo Tháng/Năm -->
+        <form id="filterForm" action="@Url.Action("Dashboard", "Dashboard")" method="get" style="display:flex;align-items:center;gap:8px;">
+            <div class="filter-group">
+                <label>Tháng</label>
+                <select class="filter-select" id="selectThang" name="thang">
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        if (m == (int)currentThang)
+                        {
+                            <option value="@m" selected>@m</option>
+                        }
+                        else
+                        {
+                            <option value="@m">@m</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Năm</label>
+                <select class="filter-select" id="selectNam" name="nam">
+                    @for (int y = DateTime.Now.Year; y >= DateTime.Now.Year - 5; y--)
+                    {
+                        if (y == (int)currentNam)
+                        {
+                            <option value="@y" selected>@y</option>
+                        }
+                        else
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn-filter-apply" id="btnApplyFilter">
+                <i class="mdi mdi-refresh"></i> Lọc
+            </button>
+        </form>
+
+        <div class="current-period-badge">
+            <i class="mdi mdi-calendar-clock"></i>
+            Tháng @currentThang / @currentNam
+        </div>
+
+        <div class="dropdown d-none d-sm-block">
+            <button class="btn btn-sm btn-light" id="dropdownMenuDate2" style="font-size:12px; border-radius:8px;">
+                <i class="mdi mdi-calendar"></i> <span id="todayLabel"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="spa-sidebar">
+    <div class="nav-section-label">Menu chính</div>
+
+    <a class="spa-nav-link active" data-section="section-dashboard" href="javascript:void(0)">
+        <span class="nav-icon"><i class="mdi mdi-view-dashboard"></i></span>
+        <span>Dashboard</span>
+        <span class="nav-badge">Tổng quan</span>
+    </a>
+
+    <a class="spa-nav-link" data-section="section-bieudo" href="javascript:void(0)">
+        <span class="nav-icon"><i class="mdi mdi-chart-donut"></i></span>
+        <span>Biểu đồ thu ngân sách</span>
+    </a>
+
+    <a class="spa-nav-link" data-section="section-bieudo2" href="javascript:void(0)">
+        <span class="nav-icon"><i class="mdi mdi-chart-bar"></i></span>
+        <span>Biểu đồ so sánh</span>
+    </a>
+
+    <div class="spa-sidebar-divider"></div>
+    <div class="nav-section-label">Chỉ tiêu chuyên môn</div>
+
+    @foreach (var nct in NhomChiTieu)
+    {
+        var sectionId = "section-" + nct.MaChiTieu;
+        var icon = nct.MaChiTieu == "DN" ? "mdi-office-building" :
+                   nct.MaChiTieu == "KT" ? "mdi-gavel" :
+                   nct.MaChiTieu == "NO" ? "mdi-cash-clock" :
+                   nct.MaChiTieu == "HD" ? "mdi-file-document-multiple" :
+                   nct.MaChiTieu == "CN" ? "mdi-cog" :
+                   nct.MaChiTieu == "HC" ? "mdi-domain" : "mdi-chart-box";
+        <a class="spa-nav-link" data-section="@sectionId" href="javascript:void(0)">
+            <span class="nav-icon"><i class="mdi @icon"></i></span>
+            <span>@nct.TenChiTieu</span>
+        </a>
+    }
+</nav>
+
+<!-- MAIN CONTENT -->
+<div id="spa-content">
+
+    <!-- ===== SECTION: DASHBOARD TỔNG QUAN ===== -->
+    <div class="spa-section active" id="section-dashboard">
+        <div class="spa-page-heading">
+            <h2><i class="mdi mdi-view-dashboard-outline" style="color:var(--spa-primary);margin-right:8px;"></i>Dashboard – Tổng quan</h2>
+            <p>Kết quả thực hiện nhiệm vụ công tác thuế &nbsp;·&nbsp; Dữ liệu tháng <strong>@currentThang/@currentNam</strong> &nbsp;·&nbsp; Ngày số liệu: <strong>@NgayBaoCaoDT</strong></p>
+        </div>
+
+        <!-- Biểu đồ tổng quan: Tổng thu nội địa + Thu ngân sách theo địa bàn -->
+        <div class="spa-card">
+            <div class="card-header-custom">
+                <span class="card-title-custom">
+                    <span class="title-dot"></span>
+                    Biểu đồ tổng thu nội địa & thu theo địa bàn
+                </span>
+                <a href="javascript:void(0)" onclick="showDiaBanDetail()" class="text-primary" style="font-size:12.5px;font-weight:600;">
+                    <i class="mdi mdi-open-in-new"></i> Chi tiết địa bàn
+                </a>
+            </div>
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="col-md-4 border-right">
+                        <div class="chart-wrapper" onclick="viewChiTieuDetailDT('@(TongThuNoiDia?.MaChiTieu ?? "")')">
+                            <canvas id="chartTongThu"></canvas>
+                        </div>
+                        @{
+                            var title = TongThuNoiDia != null ? $"{TongThuNoiDia.TenChiTieu} ({NgayBaoCaoDT})" : "";
+                        }
+                        <script>
+                            var title = @Html.Raw(Json.Encode(title));
+                            var chartLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(labelTongThu));
+                            var chartValues = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(valueTongThu));
+                            var mycolors = ['#36A2EB', '#FF6384'];
+                        </script>
+                        <script>renderDonutChart(chartLabels, chartValues, 'chartTongThu', title, mycolors);</script>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="chart-wrapper" onclick="showDiaBanDetail()">
+                            <canvas id="chartDonViAll"></canvas>
+                        </div>
+                        <script>
+                            var label_DV = @Html.Raw(Json.Encode(labelDVAll));
+                            var thuchien_DV = @Html.Raw(Json.Encode(thuchienDVAll));
+                            var kehoach_DV = @Html.Raw(Json.Encode(kehoachDVAll));
+                            var cungky_DV = @Html.Raw(Json.Encode(cungkyDVAll));
+                            var title_DV = @Html.Raw(Json.Encode("Thu ngân sách theo từng địa bàn quản lý " + "(" + NgayBaoCaoDT + ")"));
+                        </script>
+                        <script>renderLineChart('chartDonViAll', label_DV, thuchien_DV, kehoach_DV, cungky_DV, title_DV, "Địa bàn", "Số thu");</script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ chi tiêu all + TTRU -->
+        <div class="spa-card">
+            <div class="card-header-custom">
+                <span class="card-title-custom">
+                    <span class="title-dot" style="background:#f59e0b;"></span>
+                    Thu ngân sách theo nguồn thu & thu trừ 3 khoản
+                </span>
+                <a href="javascript:void(0)" onclick="showChiTieuDetail()" class="text-primary" style="font-size:12.5px;font-weight:600;">
+                    <i class="mdi mdi-open-in-new"></i> Chi tiết nguồn thu
+                </a>
+            </div>
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="col-md-8 border-right">
+                        <div class="chart-wrapper" onclick="showChiTieuDetail()">
+                            <canvas id="chartChitieuAll"></canvas>
+                        </div>
+                        <script>
+                            var label_CT = @Html.Raw(Json.Encode(labelCTAll));
+                            var thuchien_CT = @Html.Raw(Json.Encode(thuchienCTAll));
+                            var kehoach_CT = @Html.Raw(Json.Encode(kehoachCTAll));
+                            var cungky_CT = @Html.Raw(Json.Encode(cungkyCTAll));
+                            var title_CT = @Html.Raw(Json.Encode("Thu ngân sách theo nguồn thu, sắc thuế " + "(" + NgayBaoCaoDT + ")"));
+                        </script>
+                        <script>renderBarChart('chartChitieuAll', label_CT, thuchien_CT, kehoach_CT, cungky_CT, title_CT, "Nguồn thu", "Số thu", ['#36A2EB', '#FF6384']);</script>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-wrapper" onclick="viewChiTieuDetailDT('@(TTRU?.MaChiTieu ?? "")')">
+                            <canvas id="donutChartTTru"></canvas>
+                        </div>
+                        <script>
+                            var chartLabels_TTRU = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(labelTTRU));
+                            var chartValues_TTRU = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(valueTTRU));
+                            var title_TTRU = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TTRU?.TenChiTieu + "(" + NgayBaoCaoDT + ")" ?? "Không có dữ liệu"));
+                        </script>
+                        <script>renderDonutChart(chartLabels_TTRU, chartValues_TTRU, 'donutChartTTru', title_TTRU, ['#36A2EB', '#ff4747']);</script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick nav cards -->
+        <div class="row g-3">
+            @foreach (var nct in NhomChiTieu)
+            {
+                var sectionIdNav = "section-" + nct.MaChiTieu;
+                var iconNav = nct.MaChiTieu == "DN" ? "mdi-office-building" :
+                              nct.MaChiTieu == "KT" ? "mdi-gavel" :
+                              nct.MaChiTieu == "NO" ? "mdi-cash-clock" :
+                              nct.MaChiTieu == "HD" ? "mdi-file-document-multiple" :
+                              nct.MaChiTieu == "CN" ? "mdi-cog" :
+                              nct.MaChiTieu == "HC" ? "mdi-domain" : "mdi-chart-box";
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="metric-card color-blue" onclick="navigateTo('@sectionIdNav')" style="cursor:pointer;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <i class="mdi @iconNav" style="font-size:20px;color:var(--spa-primary);"></i>
+                            <span class="metric-label">@nct.MaChiTieu</span>
+                        </div>
+                        <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;">@nct.TenChiTieu</div>
+                        <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Xem chi tiết →</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ===== SECTION: BIỂU ĐỒ TỔNG THU ===== -->
+    <div class="spa-section" id="section-bieudo">
+        <div class="spa-page-heading">
+            <h2><i class="mdi mdi-chart-donut" style="color:#3b82f6;margin-right:8px;"></i>Biểu đồ Tổng thu nội địa</h2>
+            <p>Dữ liệu tháng <strong>@currentThang/@currentNam</strong> · <strong>@NgayBaoCaoDT</strong></p>
+        </div>
+        <div class="spa-card">
+            <div class="card-body-custom">
+                <div class="row justify-content-center">
+                    <div class="col-md-5">
+                        <div class="chart-wrapper" onclick="viewChiTieuDetailDT('@(TongThuNoiDia?.MaChiTieu ?? "")')">
+                            <canvas id="chartTongThu2"></canvas>
+                        </div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                renderDonutChart(chartLabels, chartValues, 'chartTongThu2', title, mycolors);
+                            });
+                        </script>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="chart-wrapper" onclick="showDiaBanDetail()">
+                            <canvas id="chartDonViAll2"></canvas>
+                        </div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                renderLineChart('chartDonViAll2', label_DV, thuchien_DV, kehoach_DV, cungky_DV, title_DV, "Địa bàn", "Số thu");
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECTION: BIỂU ĐỒ SO SÁNH ===== -->
+    <div class="spa-section" id="section-bieudo2">
+        <div class="spa-page-heading">
+            <h2><i class="mdi mdi-chart-bar" style="color:#f59e0b;margin-right:8px;"></i>Biểu đồ so sánh nguồn thu</h2>
+            <p>Dữ liệu tháng <strong>@currentThang/@currentNam</strong></p>
+        </div>
+        <div class="spa-card">
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="chart-wrapper" onclick="showChiTieuDetail()">
+                            <canvas id="chartChitieuAll2"></canvas>
+                        </div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                renderBarChart('chartChitieuAll2', label_CT, thuchien_CT, kehoach_CT, cungky_CT, title_CT, "Nguồn thu", "Số thu", ['#36A2EB','#FF6384']);
+                            });
+                        </script>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-wrapper" onclick="viewChiTieuDetailDT('@(TTRU?.MaChiTieu ?? "")')">
+                            <canvas id="donutChartTTru2"></canvas>
+                        </div>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                renderDonutChart(chartLabels_TTRU, chartValues_TTRU, 'donutChartTTru2', title_TTRU, ['#36A2EB','#ff4747']);
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECTION: DN - QUẢN LÝ DOANH NGHIỆP ===== -->
+    <div class="spa-section" id="section-DN">
+        <div class="spa-page-heading">
+            <h2>
+                <i class="mdi mdi-office-building" style="color:#1a56db;margin-right:8px;"></i>
+                @{
+                    var NhomChiTieuDN = NhomChiTieu?.Where(m => m.MaChiTieu == "DN").FirstOrDefault();
+                    if (NhomChiTieuDN != null) { <text>@NhomChiTieuDN.TenDayDu</text> } else { <text>Quản lý doanh nghiệp</text> }
+                }
+            </h2>
+            <p>Ngày báo cáo: <strong>@NgayBCQLDN</strong></p>
+        </div>
+
+        <div class="section-group-header variant-primary" onclick="viewNhomChiTieuDetail('DN')">
+            <span class="group-title">
+                <i class="mdi mdi-office-building"></i>
+                @if (NhomChiTieuDN != null) { <text>@NhomChiTieuDN.TenDayDu (@NgayBCQLDN)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+            </span>
+            <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+        </div>
+
+        <div class="row g-3">
+            @{var colorIdx = 0; var colorClasses = new[]{"color-blue","color-green","color-orange","color-red","color-purple","color-teal","color-pink"};}
+            @foreach (var item in DN)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                        <div class="metric-label">@item.MaChiTieu</div>
+                        <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                        <div class="metric-unit">@item.DonViTinh</div>
+                        <div class="metric-desc" id="card-desc-@item.MaChiTieu">
+                            @{
+                                var dg = item.DienGiai ?? "";
+                                var hasMore = dg.Length > 60;
+                                var shortDg = hasMore ? dg.Substring(0, 60) + "..." : dg;
+                            }
+                            <div id="short_@item.MaChiTieu">
+                                @shortDg
+                                @if (hasMore)
+                                {
+                                    <a class="desc-expand" onclick="event.stopPropagation();showMore('@item.MaChiTieu')">Xem thêm</a>
+                                }
+                            </div>
+                            @if (hasMore)
+                            {
+                                <div id="full_@item.MaChiTieu" style="display:none;">
+                                    @dg <a class="desc-expand" onclick="event.stopPropagation();showLess('@item.MaChiTieu')">Thu gọn</a>
+                                </div>
+                            }
+                        </div>
+                        <div style="font-size:11.5px;font-weight:600;color:#1e293b;line-height:1.4;margin-bottom:4px;">@item.TenDayDu</div>
+                    </div>
+                </div>
+                colorIdx++;
+            }
+        </div>
+    </div>
+
+    <!-- ===== SECTION: KT - KIỂM TRA THUẾ ===== -->
+    <div class="spa-section" id="section-KT">
+        <div class="spa-page-heading">
+            <h2>
+                <i class="mdi mdi-gavel" style="color:#d97706;margin-right:8px;"></i>
+                @{
+                    var NhomChiTieuKT = NhomChiTieu?.Where(m => m.MaChiTieu == "KT").FirstOrDefault();
+                    if (NhomChiTieuKT != null) { <text>@NhomChiTieuKT.TenDayDu</text> } else { <text>Kiểm tra thuế</text> }
+                }
+            </h2>
+            <p>Ngày báo cáo: <strong>@NgayBCKT</strong></p>
+        </div>
+
+        <div class="section-group-header variant-warning" onclick="viewNhomChiTieuDetail('KT')">
+            <span class="group-title">
+                <i class="mdi mdi-gavel"></i>
+                @if (NhomChiTieuKT != null) { <text>@NhomChiTieuKT.TenDayDu (@NgayBCKT)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+            </span>
+            <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+        </div>
+
+        <div class="row g-3">
+            @{colorIdx = 0;}
+            @foreach (var item in KT)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                        <div class="metric-label">@item.MaChiTieu</div>
+                        <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:6px;">@item.TenDayDu</div>
+                        <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                        <div class="metric-unit">@item.DonViTinh</div>
+                        <div class="metric-desc">
+                            @{
+                                var dg2 = item.DienGiai ?? "";
+                                var hasMore2 = dg2.Length > 60;
+                                var shortDg2 = hasMore2 ? dg2.Substring(0, 60) + "..." : dg2;
+                            }
+                            <div id="short_@item.MaChiTieu">@shortDg2
+                                @if (hasMore2) { <a class="desc-expand" onclick="event.stopPropagation();showMore('@item.MaChiTieu')">Xem thêm</a> }
+                            </div>
+                            @if (hasMore2) {
+                                <div id="full_@item.MaChiTieu" style="display:none;">@dg2 <a class="desc-expand" onclick="event.stopPropagation();showLess('@item.MaChiTieu')">Thu gọn</a></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                colorIdx++;
+            }
+        </div>
+    </div>
+
+    <!-- ===== SECTION: NO - QUẢN LÝ NỢ THUẾ ===== -->
+    <div class="spa-section" id="section-NO">
+        <div class="spa-page-heading">
+            <h2>
+                <i class="mdi mdi-cash-clock" style="color:#059669;margin-right:8px;"></i>
+                @{
+                    var NhomChiTieuNO = NhomChiTieu?.Where(m => m.MaChiTieu == "NO").FirstOrDefault();
+                    if (NhomChiTieuNO != null) { <text>@NhomChiTieuNO.TenDayDu</text> } else { <text>Quản lý nợ thuế</text> }
+                }
+            </h2>
+            <p>Ngày báo cáo: <strong>@NgayBCQLDN</strong></p>
+        </div>
+
+        <div class="section-group-header variant-success" onclick="viewNhomChiTieuDetail('NO')">
+            <span class="group-title">
+                <i class="mdi mdi-cash-clock"></i>
+                @if (NhomChiTieuNO != null) { <text>@NhomChiTieuNO.TenDayDu (@NgayBCQLDN)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+            </span>
+            <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+        </div>
+
+        <div class="row g-3">
+            @{colorIdx = 0;}
+            @foreach (var item in NO)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                        <div class="metric-label">@item.MaChiTieu</div>
+                        <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:6px;">@item.TenDayDu</div>
+                        <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                        <div class="metric-unit">@item.DonViTinh</div>
+                        <div class="metric-desc">
+                            @{
+                                var dg3 = item.DienGiai ?? "";
+                                var hasMore3 = dg3.Length > 60;
+                                var shortDg3 = hasMore3 ? dg3.Substring(0, 60) + "..." : dg3;
+                            }
+                            <div id="short_@item.MaChiTieu">@shortDg3
+                                @if (hasMore3) { <a class="desc-expand" onclick="event.stopPropagation();showMore('@item.MaChiTieu')">Xem thêm</a> }
+                            </div>
+                            @if (hasMore3) {
+                                <div id="full_@item.MaChiTieu" style="display:none;">@dg3 <a class="desc-expand" onclick="event.stopPropagation();showLess('@item.MaChiTieu')">Thu gọn</a></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                colorIdx++;
+            }
+        </div>
+    </div>
+
+    <!-- ===== SECTION: HD - HÓA ĐƠN ===== -->
+    <div class="spa-section" id="section-HD">
+        <div class="spa-page-heading">
+            <h2>
+                <i class="mdi mdi-file-document-multiple" style="color:#1a56db;margin-right:8px;"></i>
+                @{
+                    var NhomChiTieuHD = NhomChiTieu?.Where(m => m.MaChiTieu == "HD").FirstOrDefault();
+                    if (NhomChiTieuHD != null) { <text>@NhomChiTieuHD.TenDayDu</text> } else { <text>Quản lý hóa đơn</text> }
+                }
+            </h2>
+            <p>Ngày báo cáo: <strong>@NgayBCKT</strong></p>
+        </div>
+
+        <div class="section-group-header variant-primary" onclick="viewNhomChiTieuDetail('HD')">
+            <span class="group-title">
+                <i class="mdi mdi-file-document-multiple"></i>
+                @if (NhomChiTieuHD != null) { <text>@NhomChiTieuHD.TenDayDu (@NgayBCKT)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+            </span>
+            <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+        </div>
+
+        <div class="row g-3">
+            @{colorIdx = 0;}
+            @foreach (var item in HD)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                        <div class="metric-label">@item.MaChiTieu</div>
+                        <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:6px;">@item.TenDayDu</div>
+                        <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                        <div class="metric-unit">@item.DonViTinh</div>
+                        <div class="metric-desc">
+                            @{
+                                var dg4 = item.DienGiai ?? "";
+                                var hasMore4 = dg4.Length > 60;
+                                var shortDg4 = hasMore4 ? dg4.Substring(0, 60) + "..." : dg4;
+                            }
+                            <div id="short_@item.MaChiTieu">@shortDg4
+                                @if (hasMore4) { <a class="desc-expand" onclick="event.stopPropagation();showMore('@item.MaChiTieu')">Xem thêm</a> }
+                            </div>
+                            @if (hasMore4) {
+                                <div id="full_@item.MaChiTieu" style="display:none;">@dg4 <a class="desc-expand" onclick="event.stopPropagation();showLess('@item.MaChiTieu')">Thu gọn</a></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                colorIdx++;
+            }
+        </div>
+    </div>
+
+    <!-- ===== SECTION: CN - CHÍNH SÁCH NGHIỆP VỤ ===== -->
+    @if (CN != null && CN.Count > 0)
+    {
+        <div class="spa-section" id="section-CN">
+            <div class="spa-page-heading">
+                <h2>
+                    <i class="mdi mdi-cog" style="color:#8b5cf6;margin-right:8px;"></i>
+                    @{
+                        var NhomChiTieuCN = NhomChiTieu?.Where(m => m.MaChiTieu == "CN").FirstOrDefault();
+                        if (NhomChiTieuCN != null) { <text>@NhomChiTieuCN.TenDayDu</text> } else { <text>Chính sách nghiệp vụ</text> }
+                    }
+                </h2>
+                <p>Ngày báo cáo: <strong>@NgayBCCNTK</strong></p>
+            </div>
+
+            <div class="section-group-header" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);" onclick="viewNhomChiTieuDetail('CN')">
+                <span class="group-title">
+                    <i class="mdi mdi-cog"></i>
+                    @if (NhomChiTieuCN != null) { <text>@NhomChiTieuCN.TenDayDu (@NgayBCCNTK)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+                </span>
+                <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+            </div>
+
+            <div class="row g-3">
+                @{colorIdx = 0;}
+                @foreach (var item in CN)
+                {
+                    <div class="col-md-4 col-sm-6">
+                        <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                            <div class="metric-label">@item.MaChiTieu</div>
+                            <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:6px;">@item.TenDayDu</div>
+                            <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                            <div class="metric-unit">@item.DonViTinh</div>
+                        </div>
+                    </div>
+                    colorIdx++;
+                }
+            </div>
+        </div>
+    }
+
+    <!-- ===== SECTION: HC - HÀNH CHÍNH ===== -->
+    <div class="spa-section" id="section-HC">
+        <div class="spa-page-heading">
+            <h2>
+                <i class="mdi mdi-domain" style="color:#475569;margin-right:8px;"></i>
+                @{
+                    var NhomChiTieuHC = NhomChiTieu?.Where(m => m.MaChiTieu == "HC").FirstOrDefault();
+                    if (NhomChiTieuHC != null) { <text>@NhomChiTieuHC.TenDayDu</text> } else { <text>Hành chính - Văn phòng</text> }
+                }
+            </h2>
+            <p>Ngày báo cáo: <strong>@NgayBCVP</strong></p>
+        </div>
+
+        <div class="section-group-header variant-secondary" onclick="viewNhomChiTieuDetail('HC')">
+            <span class="group-title">
+                <i class="mdi mdi-domain"></i>
+                @if (NhomChiTieuHC != null) { <text>@NhomChiTieuHC.TenDayDu (@NgayBCVP)</text> } else { <text>Không tìm thấy chỉ tiêu</text> }
+            </span>
+            <span class="group-link-hint"><i class="mdi mdi-open-in-new"></i> Xem chi tiết</span>
+        </div>
+
+        <div class="row g-3">
+            @{colorIdx = 0;}
+            @foreach (var item in HC)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="metric-card @colorClasses[colorIdx % colorClasses.Length]" onclick="viewChiTieuDetail('@item.MaChiTieu')">
+                        <div class="metric-label">@item.MaChiTieu</div>
+                        <div style="font-size:13px;font-weight:600;color:#1e293b;font-family:'Be Vietnam Pro',sans-serif;margin-bottom:6px;">@item.TenDayDu</div>
+                        <div class="metric-value">@item.ThucHien.ToString("N0", nfi)</div>
+                        <div class="metric-unit">@item.DonViTinh</div>
+                        <div class="metric-desc">
+                            @{
+                                var dg6 = item.DienGiai ?? "";
+                                var hasMore6 = dg6.Length > 60;
+                                var shortDg6 = hasMore6 ? dg6.Substring(0, 60) + "..." : dg6;
+                            }
+                            <div id="short_@item.MaChiTieu">@shortDg6
+                                @if (hasMore6) { <a class="desc-expand" onclick="event.stopPropagation();showMore('@item.MaChiTieu')">Xem thêm</a> }
+                            </div>
+                            @if (hasMore6) {
+                                <div id="full_@item.MaChiTieu" style="display:none;">@dg6 <a class="desc-expand" onclick="event.stopPropagation();showLess('@item.MaChiTieu')">Thu gọn</a></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                colorIdx++;
+            }
+        </div>
+    </div>
+
+</div><!-- end #spa-content -->
+
+<!-- BACK TO TOP -->
+<button id="back-to-top" class="btn" title="Lên đầu trang" style="display:none;position:fixed;bottom:24px;right:24px;z-index:1000;width:44px;height:44px;border-radius:50%;background:#1a56db;color:white;border:none;box-shadow:0 4px 14px rgba(26,86,219,0.35);">
+    <i class="mdi mdi-arrow-up"></i>
+</button>
+
+@section scripts {
+    <script src="@Url.Content("~/Content/assets/js/jquery-3.6.0.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/chart.js@4.4.0.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/chartjs-plugin-datalabels@2.2.0.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendors/js/vendor.bundle.base.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/mychart.js")"></script>
+    <link href="@Url.Content("~/Content/assets/css/dataTables.bootstrap5.min.css")" rel="stylesheet" />
+    <script src="@Url.Content("~/Content/assets/js/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/dataTables.bootstrap5.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/off-canvas.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/template.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/settings.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/jquery.cookie.js")" type="text/javascript"></script>
+
+    <script>
+    // ============================================================
+    //  SPA NAVIGATION CORE
+    // ============================================================
+    function navigateTo(sectionId) {
+        // Ẩn tất cả sections
+        document.querySelectorAll('.spa-section').forEach(function(s) {
+            s.classList.remove('active');
+        });
+
+        // Hiện section được chọn
+        var target = document.getElementById(sectionId);
+        if (target) {
+            target.classList.add('active');
+            // Cuộn lên đầu content area
+            document.getElementById('spa-content').scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Cập nhật active nav link
+        document.querySelectorAll('.spa-nav-link').forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('data-section') === sectionId) {
+                link.classList.add('active');
+            }
+        });
+
+        // Lưu vào URL hash (không reload trang)
+        history.pushState(null, null, '#' + sectionId);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ---- Hiển thị ngày hôm nay ----
+        var today = new Date();
+        var opts = { day: '2-digit', month: 'short', year: 'numeric' };
+        var todayLabel = today.toLocaleDateString('vi-VN', opts);
+        var el = document.getElementById('todayLabel');
+        if (el) el.innerText = todayLabel;
+
+        // ---- Gán sự kiện click cho nav links ----
+        document.querySelectorAll('.spa-nav-link[data-section]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var sectionId = this.getAttribute('data-section');
+                navigateTo(sectionId);
+            });
+        });
+
+        // ---- Xử lý hash URL khi load (nếu có) ----
+        var hash = window.location.hash;
+        if (hash && hash.length > 1) {
+            var targetId = hash.substring(1);
+            var targetEl = document.getElementById(targetId);
+            if (targetEl && targetEl.classList.contains('spa-section')) {
+                navigateTo(targetId);
+            }
+        }
+
+        // ---- Sidebar toggle trên mobile ----
+        var toggleBtn = document.getElementById('sidebarToggleBtn');
+        var sidebar = document.getElementById('spa-sidebar');
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+            // Đóng sidebar khi click bên ngoài
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+
+        // ---- Back to Top ----
+        var backToTop = document.getElementById('back-to-top');
+        if (backToTop) {
+            window.addEventListener('scroll', function () {
+                backToTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+            });
+            backToTop.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // ---- Filter form: hiện loading khi submit ----
+        var filterForm = document.getElementById('filterForm');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function() {
+                var loading = document.getElementById('spa-loading');
+                if (loading) loading.classList.add('show');
+            });
+        }
+    });
+
+    // ============================================================
+    //  UTILITY FUNCTIONS
+    // ============================================================
+    function showMore(maChiTieu) {
+        var s = document.getElementById('short_' + maChiTieu);
+        var f = document.getElementById('full_' + maChiTieu);
+        if (s) s.style.display = 'none';
+        if (f) f.style.display = 'block';
+    }
+
+    function showLess(maChiTieu) {
+        var s = document.getElementById('short_' + maChiTieu);
+        var f = document.getElementById('full_' + maChiTieu);
+        if (f) f.style.display = 'none';
+        if (s) s.style.display = 'block';
+    }
+
+    function showDiaBanDetail() {
+        window.open('@Url.Action("DetailDiaBan", "Dashboard")', '_blank');
+    }
+
+    function showChiTieuDetail() {
+        window.open('@Url.Action("DetailChiTieu", "Dashboard")', '_blank');
+    }
+
+    function viewChiTieuDetail(maChiTieu) {
+        if (maChiTieu && maChiTieu.trim() !== '') {
+            window.open('@Url.Action("ChiTieuDetail", "Dashboard")?maChiTieu=' + encodeURIComponent(maChiTieu), '_blank');
+        }
+    }
+
+    function viewChiTieuDetailDT(maChiTieu) {
+        if (maChiTieu && maChiTieu.trim() !== '') {
+            window.open('@Url.Action("ChiTieuDetailDT", "Dashboard")?maChiTieu=' + encodeURIComponent(maChiTieu), '_blank');
+        }
+    }
+
+    function viewNhomChiTieuDetail(nhomChiTieu) {
+        if (nhomChiTieu && nhomChiTieu.trim() !== '') {
+            window.open('@Url.Action("NhomChiTieuDetail", "Dashboard")?nhomChiTieu=' + encodeURIComponent(nhomChiTieu), '_blank');
+        }
+    }
+    </script>
+}

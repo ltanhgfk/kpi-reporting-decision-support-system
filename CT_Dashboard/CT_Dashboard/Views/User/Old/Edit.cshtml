@@ -1,0 +1,68 @@
+﻿@model CT_Dashboard.Models.NGUOI_DUNG
+
+@{
+    ViewBag.Title = "Thêm người dùng";
+}
+<div class="container">
+    <h2 class="text-center">CẬP NHẬT NGƯỜI DÙNG</h2>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.HO_TEN)
+            @Html.TextBoxFor(model => model.HO_TEN, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.HO_TEN)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DIEN_THOAI)
+            @Html.TextBoxFor(model => model.DIEN_THOAI, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EMAIL)
+            @Html.TextBoxFor(model => model.EMAIL, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DON_VI)
+            @Html.DropDownListFor(model => model.DON_VI, new SelectList(ViewBag.DonViList, "Value", "Text"), "-- Chọn đơn vị --", new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TRANG_THAI)
+            @Html.TextBoxFor(model => model.TRANG_THAI, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.VAI_TRO)
+            @Html.DropDownListFor(model => model.VAI_TRO, new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Admin", Value = "Admin" },
+                new SelectListItem { Text = "User", Value = "User" },
+                new SelectListItem { Text = "Leader", Value = "Leader" }
+            }, "-- Chọn vai trò --", new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.USERNAME)
+            @Html.TextBoxFor(model => model.USERNAME, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PASSWORD)
+            @Html.TextBoxFor(model => model.PASSWORD, new { @class = "form-control", type = "password" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+    }
+
+</div>
+    @section styles {
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="@Url.Content("~/Content/assets/css/style.css")">
+    }
